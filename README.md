@@ -2,7 +2,7 @@
 
 Chrome extension (Manifest V3) that unlocks YouTube playback speed beyond the built-in 2x cap.
 
-> Not affiliated with YouTube or Google.
+> Store name: **Speed Master**. Not affiliated with YouTube or Google.
 
 ## Status
 

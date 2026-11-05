@@ -184,19 +184,19 @@ Compress-Archive -Path .\manifest.json, .\src, .\icons -DestinationPath .\dist\y
 - [ ] Complete publisher profile (name, contact)
 
 ### Required assets
-- [ ] Extension ZIP (manifest.json at zip root)
-- [ ] Store icon **128x128 PNG**
-- [ ] At least **1 screenshot, 1280x800** (up to 5)
-- [ ] Small promo tile **440x280 PNG** (optional but recommended)
-- [ ] **Privacy policy URL** — required because extension stores settings.
-      Host `PRIVACY.md` on GitHub Pages / gist / personal site
-- [ ] Single purpose description (1 sentence)
-- [ ] Permission justification:
+- [x] Extension ZIP (manifest.json at zip root)
+- [x] Store icon **128x128 PNG**
+- [x] At least **1 screenshot, 1280x800** (up to 5)
+- [x] Small promo tile **440x280 PNG** (optional but recommended)
+- [x] **Privacy policy URL** — required because extension stores settings.
+      Host `PRIVACY.md` on GitHub Pages / gist / personal site → GitHub Pages `docs/`
+- [x] Single purpose description (1 sentence)
+- [x] Permission justification:
       - `storage` → "Save user's preferred playback speed locally"
       - content script on `youtube.com` → "Set HTML5 video playbackRate on YouTube pages"
-- [ ] Data usage disclosure: **collects no user data**
-- [ ] Category: Productivity / Tools
-- [ ] Language, region visibility
+- [x] Data usage disclosure: **collects no user data**
+- [x] Category: Productivity / Tools
+- [ ] Language, region visibility (set in the dashboard during P6)
 
 ### Store listing draft
 - **Name:** YouTube Speed Master
@@ -239,11 +239,11 @@ Compress-Archive -Path .\manifest.json, .\src, .\icons -DestinationPath .\dist\y
 
 ## 8. Open Decisions
 
-- [ ] Extension name: **YouTube Speed Master** (alt: *SpeedUp for YouTube*, *Playback Rate Pro*)
+- [x] Extension name: **Speed Master** (repo: *YouTube-Speed-Master*; store name avoids the YouTube trademark)
 - [ ] Default max on slider: **4x** (recommended) vs 16x always visible
 - [ ] Show overlay always, or only on hover / keyboard shortcut?
 - [ ] Include per-channel memory in v1, or defer to v1.1?
-- [ ] Privacy policy host: GitHub Pages vs gist
+- [x] Privacy policy host: GitHub Pages (`docs/` on `main`)
 
 ---
 
