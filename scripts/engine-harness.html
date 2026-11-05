@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>YouTube Speed Master — engine harness</title>
+    <style>
+      body {
+        font: 14px/1.5 system-ui, sans-serif;
+        margin: 24px;
+        background: #0f1115;
+        color: #f2f4f8;
+      }
+      code {
+        color: #2dd4bf;
+      }
+      pre {
+        background: #171b24;
+        padding: 12px;
+        border-radius: 8px;
+      }
+      video {
+        width: 320px;
+        background: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Engine harness</h1>
+    <p>Loads <code>/src/content.js</code> as a page script. Dev-only, not shipped behavior.</p>
+
+    <div id="movie_player" class="html5-video-player">
+      <video id="v" class="html5-main-video"></video>
+    </div>
+
+    <pre id="out">waiting for tests…</pre>
+
+    <script src="/src/content.js"></script>
+    <script>
+      window.__results = [];
+      window.check = (name, ok, extra) => window.__results.push({ name, ok, extra });
+      document.getElementById('out').textContent = 'engine loaded: ' + Boolean(window.__ytSpeedMaster);
+    </script>
+  </body>
+</html>
