@@ -22,7 +22,7 @@ Replace `[PRIVACY_URL]` once GitHub Pages is live.
 Play YouTube up to 4x with preset speeds, a slider and hotkeys. Pitch stays natural. No tracking.
 ```
 
-(110 characters)
+(97 characters)
 
 ## Detailed description
 
