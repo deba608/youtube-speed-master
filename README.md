@@ -1,27 +1,35 @@
-<div align="center">
+<p align="center">
+  <img src="icons/icon128.png" width="88" height="88" alt="Speed Master icon" />
+</p>
 
-<img src="icons/icon128.png" width="88" height="88" alt="Speed Master icon" />
+<h1 align="center">Speed Master</h1>
 
-# Speed Master
+<p align="center">
+  <strong>YouTube playback speed, unlocked.</strong><br />
+  A Manifest V3 Chrome extension that goes beyond YouTube's built-in 2x cap:<br />
+  <strong>0.25x–4x</strong> from the player UI, up to <strong>16x</strong> from the console.
+</p>
 
-**YouTube playback speed, unlocked.**
+<p align="center">
+  <a href="https://github.com/deba608/youtube-speed-master/releases"><img src="https://img.shields.io/github/v/release/deba608/youtube-speed-master?label=release&color=2dd4bf" alt="Release" /></a>
+  <a href="manifest.json"><img src="https://img.shields.io/badge/manifest-v3-2dd4bf" alt="Manifest V3" /></a>
+  <a href="tests/qa.mjs"><img src="https://img.shields.io/badge/QA-23%2F23-2dd4bf" alt="QA: 23/23" /></a>
+  <a href="PRIVACY.md"><img src="https://img.shields.io/badge/tracking-none-2dd4bf" alt="No tracking" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/deba608/youtube-speed-master?color=2dd4bf" alt="License: MIT" /></a>
+</p>
 
-A Manifest V3 Chrome extension that goes beyond YouTube's built-in 2x cap: **0.25x–4x** from the
-player UI, up to **16x** from the console.
+<p align="center">
+  <a href="#install">Install</a> ·
+  <a href="#usage">Usage</a> ·
+  <a href="#console-api">Console API</a> ·
+  <a href="#development">Development</a> ·
+  <a href="#qa">QA</a> ·
+  <a href="#packaging--store-assets">Store package</a> ·
+  <a href="#troubleshooting">Troubleshooting</a> ·
+  <a href="ROADMAP.md">Roadmap</a>
+</p>
 
-[![Release](https://img.shields.io/github/v/release/deba608/youtube-speed-master?label=release&color=2dd4bf)](https://github.com/deba608/youtube-speed-master/releases)
-[![Manifest V3](https://img.shields.io/badge/manifest-v3-2dd4bf)](manifest.json)
-[![QA](https://img.shields.io/badge/QA-23%2F23-2dd4bf)](tests/qa.mjs)
-[![No tracking](https://img.shields.io/badge/tracking-none-2dd4bf)](PRIVACY.md)
-[![License: MIT](https://img.shields.io/github/license/deba608/youtube-speed-master?color=2dd4bf)](LICENSE)
-
-[Install](#install) · [Usage](#usage) · [Console API](#console-api) · [Development](#development) ·
-[QA](#qa) · [Store package](#packaging--store-assets) · [Troubleshooting](#troubleshooting) ·
-[Roadmap](ROADMAP.md)
-
-</div>
-
-![Speed Master's speed panel open in the YouTube player](store/screenshot-1.png)
+![Speed Master speed panel and presets](store/screenshot-1.png)
 
 ## Features
 
@@ -34,10 +42,11 @@ player UI, up to **16x** from the console.
 - **Ads stay at 1x** — the panel shows an `Ad · 1x` badge, then your speed returns after the ad.
 - **Sticks to the video** — re-applies after SPA navigation, player rebuilds, `loadedmetadata` and
   YouTube resetting the rate. Works in fullscreen.
-- **Private by design** — no account, analytics, telemetry, remote code or network requests.
+- **Private by design** — no account, analytics, telemetry, remote code or network requests of its
+  own.
 
 **Status:** v1.0.0 is packaged and available on GitHub. Chrome Web Store submission is the last
-remaining step; see [store/PUBLISH.md](store/PUBLISH.md).
+remaining step; see [store/PUBLISH.md](store/PUBLISH.md). What comes next is in [ROADMAP.md](ROADMAP.md).
 
 New here? [GUIDE.md](GUIDE.md) covers install, controls, settings and troubleshooting in detail.
 
@@ -70,8 +79,9 @@ cd youtube-speed-master
 npm install
 ```
 
-Then load the repository folder with **Load unpacked**. After editing `src/content.js` or
-`src/overlay.css`, click the reload icon on the extension card and reload the YouTube tab.
+Then load the repository folder with **Load unpacked** (`npm install` is only needed for the QA,
+packaging and asset scripts). After editing `src/content.js` or `src/overlay.css`, click the reload
+icon on the extension card and reload the YouTube tab.
 
 Step-by-step instructions for Chrome, the ZIP, Edge and Brave:
 [GUIDE.md § Install](GUIDE.md#install).
@@ -153,7 +163,7 @@ YouTube actively resets the rate, so the engine:
 - forces ads to 1x and restores your speed when the ad ends.
 
 The extension is MV3, requests only the `storage` permission, and runs a content script on
-`*://*.youtube.com/*`. There is no remote code and no page data is read or transmitted.
+`*://*.youtube.com/*`. There is no remote code and no page data is collected or transmitted.
 
 ## Development
 
