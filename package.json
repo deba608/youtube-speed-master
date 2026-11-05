@@ -1,0 +1,24 @@
+{
+  "name": "youtube-speed-master",
+  "version": "0.4.0",
+  "private": true,
+  "description": "Chrome extension (Manifest V3) that unlocks YouTube playback speed beyond the built-in 2x cap.",
+  "type": "module",
+  "scripts": {
+    "qa": "node tests/qa.mjs",
+    "icons": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/make-icons.ps1",
+    "check": "node --check src/content.js && node --check src/popup.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deba608/youtube-speed-master.git"
+  },
+  "bugs": {
+    "url": "https://github.com/deba608/youtube-speed-master/issues"
+  },
+  "homepage": "https://github.com/deba608/youtube-speed-master#readme",
+  "devDependencies": {
+    "playwright": "^1.64.1",
+    "selfsigned": "^5.5.0"
+  }
+}

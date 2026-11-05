@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>YouTube fixture</title>
+    <style>
+      body { margin: 0; background: #0f0f0f; font-family: system-ui, sans-serif; }
+      #movie_player { position: relative; width: 640px; height: 360px; margin: 24px auto; background: #000; }
+      #movie_player video { display: block; width: 100%; height: 100%; }
+      .note { color: #aaa; text-align: center; font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <div id="movie_player" class="html5-video-player">
+      <video class="html5-main-video" playsinline></video>
+    </div>
+    <p class="note">Local YouTube-shaped fixture for QA. No media is loaded.</p>
+
+    <script>
+      window.__fixture = {
+        setRate(rate) {
+          document.querySelector('video').playbackRate = rate;
+        },
+        addAd() {
+          document.getElementById('movie_player').classList.add('ad-showing');
+        },
+        removeAd() {
+          document.getElementById('movie_player').classList.remove('ad-showing');
+        },
+        replaceVideo() {
+          const old = document.querySelector('video');
+          const video = document.createElement('video');
+          video.className = 'html5-main-video';
+          video.setAttribute('playsinline', '');
+          old.replaceWith(video);
+          return true;
+        },
+        spaNavigate() {
+          document.dispatchEvent(new Event('yt-navigate-finish'));
+        },
+      };
+    </script>
+  </body>
+</html>
