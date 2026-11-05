@@ -1,4 +1,302 @@
 /*
- * YouTube Speed Master — floating overlay panel styles.
- * Panel markup is injected by content.js in P2.
+ * YouTube Speed Master — floating overlay panel.
+ * Every selector is scoped to #ytsm-root so YouTube's stylesheet cannot leak in.
  */
+
+#ytsm-root {
+  --ytsm-accent: #2dd4bf;
+  --ytsm-accent-strong: #5eead4;
+  --ytsm-bg: rgba(13, 17, 23, 0.96);
+  --ytsm-border: rgba(255, 255, 255, 0.12);
+  --ytsm-muted: #9aa3b2;
+
+  position: absolute;
+  right: 12px;
+  bottom: 64px;
+  z-index: 120;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #f2f4f8;
+  text-align: left;
+  direction: ltr;
+}
+
+#ytsm-root[hidden] {
+  display: none !important;
+}
+
+#ytsm-root,
+#ytsm-root * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+#ytsm-root .ytsm-dock {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* --- collapsed pill --- */
+
+#ytsm-root .ytsm-toggle {
+  appearance: none;
+  -webkit-appearance: none;
+  min-width: 58px;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid var(--ytsm-border);
+  border-radius: 999px;
+  background: rgba(13, 17, 23, 0.72);
+  color: #f2f4f8;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  opacity: 0.55;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: opacity 0.15s ease, border-color 0.15s ease;
+}
+
+#ytsm-root .ytsm-toggle:hover,
+#ytsm-root .ytsm-toggle:focus-visible,
+#ytsm-root[data-open="true"] .ytsm-toggle {
+  opacity: 1;
+  border-color: var(--ytsm-accent);
+  outline: none;
+}
+
+/* --- panel --- */
+
+#ytsm-root .ytsm-panel {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  width: 268px;
+  max-width: calc(100vw - 24px);
+  padding: 12px;
+  border: 1px solid var(--ytsm-border);
+  border-radius: 12px;
+  background: var(--ytsm-bg);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(6px) scale(0.98);
+  transform-origin: bottom right;
+  pointer-events: none;
+  transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s;
+}
+
+#ytsm-root[data-open="true"] .ytsm-panel {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+#ytsm-root .ytsm-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+#ytsm-root .ytsm-title {
+  flex: 1;
+  color: var(--ytsm-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+#ytsm-root .ytsm-value {
+  color: var(--ytsm-accent-strong);
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+#ytsm-root .ytsm-close {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ytsm-muted);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#ytsm-root .ytsm-close:hover,
+#ytsm-root .ytsm-close:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f2f4f8;
+  outline: none;
+}
+
+/* --- slider --- */
+
+#ytsm-root .ytsm-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 20px;
+  margin: 10px 0 8px;
+  background: transparent;
+  cursor: pointer;
+}
+
+#ytsm-root .ytsm-slider:focus-visible {
+  outline: 2px solid var(--ytsm-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+#ytsm-root .ytsm-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--ytsm-accent) 0%,
+    var(--ytsm-accent) var(--ytsm-fill, 20%),
+    rgba(255, 255, 255, 0.16) var(--ytsm-fill, 20%),
+    rgba(255, 255, 255, 0.16) 100%
+  );
+}
+
+#ytsm-root .ytsm-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -4px;
+  border: 2px solid var(--ytsm-accent);
+  border-radius: 50%;
+  background: #f8fafc;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+#ytsm-root .ytsm-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+#ytsm-root .ytsm-slider::-moz-range-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--ytsm-accent);
+}
+
+#ytsm-root .ytsm-slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--ytsm-accent);
+  border-radius: 50%;
+  background: #f8fafc;
+}
+
+/* --- presets --- */
+
+#ytsm-root .ytsm-presets {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+}
+
+#ytsm-root .ytsm-preset {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 5px 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #dbe1ea;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+#ytsm-root .ytsm-preset:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+#ytsm-root .ytsm-preset:focus-visible {
+  outline: 2px solid var(--ytsm-accent);
+  outline-offset: 1px;
+}
+
+#ytsm-root .ytsm-preset.is-active {
+  border-color: rgba(45, 212, 191, 0.55);
+  background: rgba(45, 212, 191, 0.18);
+  color: var(--ytsm-accent-strong);
+  font-weight: 700;
+}
+
+/* --- footer --- */
+
+#ytsm-root .ytsm-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--ytsm-muted);
+  font-size: 11px;
+}
+
+#ytsm-root .ytsm-pitch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+#ytsm-root .ytsm-pitch input {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  accent-color: var(--ytsm-accent);
+  cursor: pointer;
+}
+
+#ytsm-root .ytsm-hint {
+  font-size: 10px;
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+#ytsm-root .ytsm-ad {
+  margin-top: 8px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(251, 191, 36, 0.14);
+  color: #fbbf24;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+}
+
+#ytsm-root .ytsm-ad[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #ytsm-root .ytsm-panel,
+  #ytsm-root .ytsm-toggle,
+  #ytsm-root .ytsm-preset {
+    transition: none;
+  }
+}
