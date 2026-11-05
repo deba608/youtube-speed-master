@@ -6,9 +6,8 @@ Chrome extension (Manifest V3) that unlocks YouTube playback speed beyond the bu
 
 ## Status
 
-**P3 — Settings.** Popup sets the global default speed and pitch preference; both persist in
-`chrome.storage.sync`, survive restarts and sync across Chrome profiles. In-page changes (slider,
-presets, hotkeys) update the saved default too.
+**P5 — Store prep.** Feature-complete at v1.0.0: store listing copy, 1280x800 screenshots,
+440x280 promo tile, public privacy policy and a reproducible upload ZIP.
 
 Roadmap and design notes: [PLAN.md](PLAN.md).
 
@@ -29,7 +28,7 @@ Speed and pitch are stored in `chrome.storage.sync` — no account, no network c
 2. Enable **Developer mode**
 3. **Load unpacked** → select this folder
 4. Visit any `youtube.com/watch?v=...` page
-5. DevTools console should log `[YouTube Speed Master] ready (P3)`
+5. DevTools console should log `[YouTube Speed Master] ready`
 
 After editing `content.js`: click the reload icon on the extension card, then reload the
 YouTube tab.
@@ -73,6 +72,20 @@ manifest match rule, content script, storage and UI are all exercised end to end
 Manual cases that need a human on real YouTube (live, Shorts, playlist, incognito, fullscreen):
 [tests/MANUAL-QA.md](tests/MANUAL-QA.md).
 
+## Store package
+
+```powershell
+npm run package   # writes dist/youtube-speed-master-1.0.0.zip
+```
+
+The ZIP contains `manifest.json`, `src/` and `icons/` only — manifest at the root, no dev files.
+The script verifies the required entries and fails if any are missing.
+
+- Listing copy, permission justifications and data disclosures: [store/LISTING.md](store/LISTING.md)
+- Screenshots + promo tile: `store/`, regenerated with `npm run assets`
+- Privacy policy (public): https://deba608.github.io/youtube-speed-master/privacy.html
+- Source of the policy page: [docs/privacy.html](docs/privacy.html)
+
 ## Layout
 
 ```
@@ -81,8 +94,10 @@ src/content.js    rate engine + overlay panel
 src/overlay.css   overlay panel styles
 src/popup.*       settings popup
 icons/            16 / 32 / 48 / 128 px
-scripts/          icon generator + dev harnesses
+scripts/          icon generator, packager, dev harnesses
 tests/            Playwright QA + manual checklist
+store/            listing copy, screenshots, promo tile
+docs/             GitHub Pages site (privacy policy)
 ```
 
 ## Regenerate icons

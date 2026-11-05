@@ -498,5 +498,5 @@
   window.setInterval(apply, 1000);
 
   apply();
-  console.log(`${LOG_PREFIX} ready (P3). Try Shift+. / Shift+, or __ytSpeedMaster.setRate(3)`);
+  console.log(`${LOG_PREFIX} ready. Try Shift+. / Shift+, or __ytSpeedMaster.setRate(3)`);
 })();
