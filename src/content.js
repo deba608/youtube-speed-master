@@ -12,9 +12,7 @@
  *  - slider 0.25x–4x (step 0.05), presets, pitch toggle
  *  - Shift+. / Shift+, step ±0.25x
  *
- * No storage yet (P3). Default rate is 1x per page load.
- *
- * Console test (DevTools → Console → context dropdown → "YouTube Speed Master"):
+ * Console test (DevTools → Console → context dropdown → "Speed Master"):
  *   __ytSpeedMaster.setRate(3)
  *   __ytSpeedMaster.info()
  *   __ytSpeedMaster.reset()
@@ -31,15 +29,24 @@
   const UI_MIN_RATE = 0.25;
   const UI_MAX_RATE = 4;
   const EPSILON = 0.001;
-  const PRESETS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4];
+  const DEFAULT_PRESETS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4];
+  const MIN_PRESETS = 3;
+  const MAX_PRESETS = 12;
+  const MAX_CHANNELS = 500;
+  const CHANNEL_PATH = /^\/(?:@|channel\/|c\/|user\/)/;
 
   // Content scripts can run twice (reload / bfcache); keep one engine per page.
   if (window.__ytSpeedMaster) return;
 
   const state = {
     desired: 1,
+    defaultRate: 1,
     enabled: true,
     preservesPitch: true,
+    presets: [...DEFAULT_PRESETS],
+    channelKey: null,
+    channelName: '',
+    channelRates: {},
     applying: false, // loop guard: true while we are the ones writing playbackRate
     video: null,
     ad: false,
@@ -49,7 +56,9 @@
   let api = null;
 
   const hasSyncStorage = typeof chrome !== 'undefined' && Boolean(chrome.storage?.sync);
+  const hasLocalStorage = typeof chrome !== 'undefined' && Boolean(chrome.storage?.local);
   let persistTimer = 0;
+  let channelTimer = 0;
   let suppressPersist = false;
 
   const clampRate = (value) => {
@@ -62,11 +71,73 @@
   const clampUiRate = (value) =>
     Math.min(UI_MAX_RATE, Math.max(UI_MIN_RATE, Math.round(value * 100) / 100));
 
+  const sanitizePresets = (value) => {
+    if (!Array.isArray(value)) return [...DEFAULT_PRESETS];
+    const seen = new Set();
+    const list = [];
+    for (const entry of value) {
+      const rate = Number(entry);
+      if (!Number.isFinite(rate)) continue;
+      const rounded = clampUiRate(rate);
+      const key = rounded.toFixed(2);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      list.push(rounded);
+    }
+    list.sort((a, b) => a - b);
+    return list.length < MIN_PRESETS ? [...DEFAULT_PRESETS] : list.slice(0, MAX_PRESETS);
+  };
+
+  const sanitizeChannels = (value) => {
+    if (!value || typeof value !== 'object') return {};
+    const entries = [];
+    for (const [key, entry] of Object.entries(value)) {
+      if (typeof key !== 'string' || !CHANNEL_PATH.test(key)) continue;
+      if (!entry || typeof entry !== 'object') continue;
+      const rate = Number(entry.rate);
+      if (!Number.isFinite(rate)) continue;
+      entries.push([
+        key,
+        {
+          rate: clampRate(rate),
+          name: typeof entry.name === 'string' ? entry.name.slice(0, 60) : '',
+          updated: Number.isFinite(entry.updated) ? entry.updated : 0,
+        },
+      ]);
+    }
+    entries.sort((a, b) => b[1].updated - a[1].updated);
+    return Object.fromEntries(entries.slice(0, MAX_CHANNELS));
+  };
+
+  const getChannel = () => {
+    const link = document.querySelector(
+      'ytd-video-owner-renderer a[href], ytd-watch-metadata #owner a[href], #owner a[href]'
+    );
+    if (!link) return { key: null, name: '' };
+    let pathname;
+    try {
+      pathname = new URL(link.getAttribute('href'), location.origin).pathname;
+    } catch (error) {
+      return { key: null, name: '' };
+    }
+    const trimmed = pathname.replace(/\/+$/, '');
+    if (!CHANNEL_PATH.test(trimmed)) return { key: null, name: '' };
+    const name = (link.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 60);
+    return { key: trimmed.toLowerCase(), name };
+  };
+
+  const isRemembered = () =>
+    Boolean(state.channelKey && state.channelRates[state.channelKey]);
+
   const getVideo = () =>
     document.querySelector('video.html5-main-video') || document.querySelector('video');
 
   const isAdShowing = () =>
-    Boolean(document.querySelector('#movie_player.ad-showing, .html5-video-player.ad-showing'));
+    Boolean(
+      document.querySelector(
+        '#movie_player.ad-showing, .html5-video-player.ad-showing, .ytp-ad-player-overlay'
+      )
+    );
 
   function notify() {
     if (!api) return;
@@ -80,26 +151,92 @@
     }
   }
 
-  const persist = () => {
-    if (!hasSyncStorage || suppressPersist) return;
+  const writeSync = (patch) => {
+    if (!hasSyncStorage) return;
+    try {
+      chrome.storage.sync.set(patch, () => {
+        if (chrome.runtime.lastError) {
+          console.warn(
+            `${LOG_PREFIX} could not save settings`,
+            chrome.runtime.lastError.message
+          );
+        }
+      });
+    } catch (error) {
+      console.warn(`${LOG_PREFIX} could not save settings`, error);
+    }
+  };
+
+  const writeChannels = () => {
+    if (!hasLocalStorage) return;
+    try {
+      chrome.storage.local.set({ channelRates: state.channelRates }, () => {
+        if (chrome.runtime.lastError) {
+          console.warn(
+            `${LOG_PREFIX} could not save channel rates`,
+            chrome.runtime.lastError.message
+          );
+        }
+      });
+    } catch (error) {
+      console.warn(`${LOG_PREFIX} could not save channel rates`, error);
+    }
+  };
+
+  const pruneChannels = () => {
+    const entries = Object.entries(state.channelRates);
+    if (entries.length <= MAX_CHANNELS) return;
+    entries.sort((a, b) => (b[1]?.updated || 0) - (a[1]?.updated || 0));
+    state.channelRates = Object.fromEntries(entries.slice(0, MAX_CHANNELS));
+  };
+
+  const saveChannel = (key, rate, name) => {
+    if (!key) return;
+    state.channelRates[key] = {
+      rate: clampRate(rate),
+      name: (name || state.channelRates[key]?.name || '').slice(0, 60),
+      updated: Date.now(),
+    };
+    pruneChannels();
+    clearTimeout(channelTimer);
+    channelTimer = window.setTimeout(writeChannels, 250);
+  };
+
+  const removeChannel = (key) => {
+    if (!key || !state.channelRates[key]) return;
+    delete state.channelRates[key];
+    clearTimeout(channelTimer);
+    writeChannels();
+  };
+
+  const persistRate = () => {
+    if (suppressPersist) return;
+    // A remembered channel takes the write; otherwise the global default does.
+    if (state.channelKey && state.channelRates[state.channelKey]) {
+      saveChannel(state.channelKey, state.desired, state.channelName);
+      return;
+    }
+    if (!hasSyncStorage) return;
     clearTimeout(persistTimer);
     persistTimer = window.setTimeout(() => {
-      try {
-        chrome.storage.sync.set(
-          { defaultRate: state.desired, preservesPitch: state.preservesPitch },
-          () => {
-            if (chrome.runtime.lastError) {
-              console.warn(
-                `${LOG_PREFIX} could not save settings`,
-                chrome.runtime.lastError.message
-              );
-            }
-          }
-        );
-      } catch (error) {
-        console.warn(`${LOG_PREFIX} could not save settings`, error);
-      }
+      writeSync({ defaultRate: state.desired, preservesPitch: state.preservesPitch });
     }, 250);
+  };
+
+  const persistPitch = () => {
+    if (suppressPersist) return;
+    writeSync({ preservesPitch: state.preservesPitch });
+  };
+
+  const setDesired = (rate, { persist = true } = {}) => {
+    const next = clampRate(rate);
+    if (Math.abs(next - state.desired) > EPSILON) {
+      state.desired = next;
+      notify();
+      if (persist) persistRate();
+    }
+    apply();
+    return state.desired;
   };
 
   const setPitch = (video) => {
@@ -123,6 +260,8 @@
     if (ad !== state.ad) {
       state.ad = ad;
       notify();
+      // Re-assert exactly once when the ad hands playback back.
+      if (!ad) scheduleApply(80);
     }
 
     const video = getVideo();
@@ -148,26 +287,52 @@
 
   // --- Console / automation API -------------------------------------------------
 
+  const refreshChannel = ({ force = false } = {}) => {
+    const { key, name } = getChannel();
+    if (!force && key === state.channelKey) {
+      if (name) state.channelName = name;
+      return;
+    }
+
+    state.channelKey = key;
+    state.channelName = name;
+
+    const entry = key ? state.channelRates[key] : null;
+    const next = entry ? clampRate(entry.rate) : clampRate(state.defaultRate);
+    if (Math.abs(next - state.desired) > EPSILON) {
+      state.desired = next;
+      notify();
+    } else if (force) {
+      notify();
+    }
+    apply();
+  };
+
   api = {
-    setRate: (rate) => {
-      const next = clampRate(rate);
-      if (Math.abs(next - state.desired) > EPSILON) {
-        state.desired = next;
-        notify();
-        persist();
-      }
-      apply();
-      return state.desired;
-    },
+    setRate: (rate) => setDesired(rate),
     getRate: () => state.desired,
     reset: () => api.setRate(1),
     setPitch: (on) => {
       state.preservesPitch = Boolean(on);
       apply();
       notify();
-      persist();
+      persistPitch();
       return state.preservesPitch;
     },
+    setPresets: (list) => {
+      state.presets = sanitizePresets(list);
+      notify();
+      writeSync({ presets: state.presets });
+      return [...state.presets];
+    },
+    remember: (on) => {
+      if (!state.channelKey) return false;
+      if (on) saveChannel(state.channelKey, state.desired, state.channelName);
+      else removeChannel(state.channelKey);
+      notify();
+      return isRemembered();
+    },
+    refreshChannel: () => refreshChannel({ force: true }),
     enable: (on = true) => {
       state.enabled = Boolean(on);
       apply();
@@ -184,14 +349,21 @@
       return {
         desired: state.desired,
         applied: video ? video.playbackRate : null,
+        defaultRate: state.defaultRate,
         enabled: state.enabled,
         preservesPitch: state.preservesPitch,
         ad: isAdShowing(),
         hasVideo: Boolean(video),
+        channel: state.channelKey,
+        channelName: state.channelName,
+        remembered: isRemembered(),
+        presets: [...state.presets],
       };
     },
     apply,
   };
+
+  api.extensionId = typeof chrome !== 'undefined' && chrome.runtime ? chrome.runtime.id : null;
 
   Object.defineProperty(window, '__ytSpeedMaster', { value: api, configurable: true });
 
@@ -305,6 +477,10 @@
             aria-label="Playback speed"
           />
           <div class="ytsm-presets" role="group" aria-label="Speed presets"></div>
+          <label class="ytsm-remember" hidden>
+            <input type="checkbox" />
+            <span class="ytsm-remember-text">Remember this channel</span>
+          </label>
           <div class="ytsm-foot">
             <label class="ytsm-pitch">
               <input type="checkbox" checked />
@@ -331,21 +507,34 @@
     const pitch = root.querySelector('.ytsm-pitch input');
     const adBadge = root.querySelector('.ytsm-ad');
     const presetBox = root.querySelector('.ytsm-presets');
+    const rememberRow = root.querySelector('.ytsm-remember');
+    const rememberBox = rememberRow.querySelector('input');
+    const rememberText = rememberRow.querySelector('.ytsm-remember-text');
 
-    const presetButtons = PRESETS.map((rate) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'ytsm-preset';
-      button.dataset.rate = String(rate);
-      button.textContent = `${rate}x`;
-      presetBox.appendChild(button);
-      return button;
-    });
+    let presetButtons = [];
+    let presetSignature = '';
+
+    const renderPresets = (list) => {
+      const signature = list.join(',');
+      if (signature === presetSignature) return;
+      presetSignature = signature;
+      presetBox.textContent = '';
+      presetButtons = list.map((rate) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'ytsm-preset';
+        button.dataset.rate = String(rate);
+        button.textContent = `${rate}x`;
+        presetBox.appendChild(button);
+        return button;
+      });
+    };
 
     let dragging = false;
     let open = false;
 
     const sync = (info) => {
+      renderPresets(info.presets);
       const label = `${info.desired.toFixed(2)}x`;
       value.textContent = label;
       toggle.textContent = label;
@@ -363,6 +552,17 @@
       }
       pitch.checked = info.preservesPitch;
       adBadge.hidden = !info.ad;
+
+      rememberRow.hidden = !info.channel;
+      rememberBox.checked = info.remembered;
+      if (info.channel) {
+        rememberText.textContent = info.channelName
+          ? `Remember ${info.channelName}`
+          : 'Remember this channel';
+        rememberRow.title = info.remembered
+          ? 'This channel uses its own saved speed'
+          : 'Save the current speed for this channel';
+      }
     };
 
     const setOpen = (next) => {
@@ -386,6 +586,9 @@
       if (button) api.setRate(Number(button.dataset.rate));
     });
     pitch.addEventListener('change', () => api.setPitch(pitch.checked));
+    rememberBox.addEventListener('change', () => {
+      api.remember(rememberBox.checked);
+    });
 
     // Keep player clicks (play/pause, seek, fullscreen) out of our controls.
     for (const type of [
