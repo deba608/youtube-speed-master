@@ -38,3 +38,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\make-icons.ps1
 ## Privacy
 
 No data collected. See [PRIVACY.md](PRIVACY.md).
+
+## License
+
+[MIT](LICENSE)
