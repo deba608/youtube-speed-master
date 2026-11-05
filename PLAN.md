@@ -183,6 +183,8 @@ Compress-Archive -Path .\manifest.json, .\src, .\icons -DestinationPath .\dist\y
 - [ ] Verify developer email
 - [ ] Complete publisher profile (name, contact)
 
+> Step-by-step dashboard walkthrough: [store/PUBLISH.md](store/PUBLISH.md)
+
 ### Required assets
 - [x] Extension ZIP (manifest.json at zip root)
 - [x] Store icon **128x128 PNG**
@@ -196,14 +198,15 @@ Compress-Archive -Path .\manifest.json, .\src, .\icons -DestinationPath .\dist\y
       - content script on `youtube.com` → "Set HTML5 video playbackRate on YouTube pages"
 - [x] Data usage disclosure: **collects no user data**
 - [x] Category: Productivity / Tools
-- [ ] Language, region visibility (set in the dashboard during P6)
+- [x] Language: English; region visibility: all regions (set in the dashboard)
 
-### Store listing draft
-- **Name:** YouTube Speed Master
+### Store listing draft (final — see `store/LISTING.md`)
+- **Name:** Speed Master
 - **Short description (≤132 chars):**
-  `Play YouTube up to 4x (16x custom) with one click. Speed presets, hotkeys, auto-apply. No tracking.`
+  `Play YouTube up to 4x with preset speeds, a slider and hotkeys. Pitch stays natural. No tracking.`
 - **Detailed description:** problem → features → privacy → changelog
 - **Screenshots:** panel open at 2.5x, popup settings, hotkey overlay
+- **Dashboard steps:** [store/PUBLISH.md](store/PUBLISH.md)
 
 ### Review process
 - Submit → automated checks → human review, usually **1–3 business days** (new devs sometimes 1–2 weeks)
@@ -240,8 +243,8 @@ Compress-Archive -Path .\manifest.json, .\src, .\icons -DestinationPath .\dist\y
 ## 8. Open Decisions
 
 - [x] Extension name: **Speed Master** (repo: *YouTube-Speed-Master*; store name avoids the YouTube trademark)
-- [ ] Default max on slider: **4x** (recommended) vs 16x always visible
-- [ ] Show overlay always, or only on hover / keyboard shortcut?
+- [x] Default max on slider: **4x** (console API goes to 16x for power users)
+- [x] Overlay: compact speed pill always available, full panel on click / hotkey
 - [ ] Include per-channel memory in v1, or defer to v1.1?
 - [x] Privacy policy host: GitHub Pages (`docs/` on `main`)
 

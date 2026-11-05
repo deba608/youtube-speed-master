@@ -1,7 +1,8 @@
 # Chrome Web Store listing — Speed Master
 
-Store copy and metadata for YouTube Speed Master v1.0.0.
-Replace `[PRIVACY_URL]` once GitHub Pages is live.
+Store copy and metadata for Speed Master v1.0.0.
+
+Dashboard walkthrough: [PUBLISH.md](PUBLISH.md).
 
 ---
 

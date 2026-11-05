@@ -6,8 +6,8 @@ Chrome extension (Manifest V3) that unlocks YouTube playback speed beyond the bu
 
 ## Status
 
-**P5 — Store prep.** Feature-complete at v1.0.0: store listing copy, 1280x800 screenshots,
-440x280 promo tile, public privacy policy and a reproducible upload ZIP.
+**P6 — Publishing.** v1.0.0 is packaged and documented; the only remaining step is the developer
+dashboard (account, upload, submit). Walkthrough: [store/PUBLISH.md](store/PUBLISH.md).
 
 Roadmap and design notes: [PLAN.md](PLAN.md).
 
@@ -95,6 +95,7 @@ The ZIP contains `manifest.json`, `src/` and `icons/` only — manifest at the r
 The script verifies the required entries and fails if any are missing.
 
 - Listing copy, permission justifications and data disclosures: [store/LISTING.md](store/LISTING.md)
+- Dashboard walkthrough (account → upload → submit): [store/PUBLISH.md](store/PUBLISH.md)
 - Screenshots + promo tile: `store/`, regenerated with `npm run assets`
 - Privacy policy (public): https://deba608.github.io/youtube-speed-master/privacy.html
 - Source of the policy page: [docs/privacy.html](docs/privacy.html)
