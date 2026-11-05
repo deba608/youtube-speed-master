@@ -9,6 +9,8 @@
   --ytsm-bg: rgba(13, 17, 23, 0.96);
   --ytsm-border: rgba(255, 255, 255, 0.12);
   --ytsm-muted: #9aa3b2;
+  --ytsm-scale: 1;
+  --ytsm-opacity: 1;
 
   position: absolute;
   right: 12px;
@@ -20,6 +22,15 @@
   color: #f2f4f8;
   text-align: left;
   direction: ltr;
+}
+
+#ytsm-root[data-position="left"] {
+  right: auto;
+  left: 12px;
+}
+
+#ytsm-root[data-page="shorts"] {
+  bottom: 92px;
 }
 
 #ytsm-root[hidden] {
@@ -40,6 +51,32 @@
   position: relative;
   display: flex;
   justify-content: flex-end;
+  opacity: var(--ytsm-opacity);
+  transform: scale(var(--ytsm-scale));
+  transform-origin: bottom right;
+  transition: opacity 0.18s ease;
+}
+
+#ytsm-root[data-position="left"] .ytsm-dock {
+  justify-content: flex-start;
+  transform-origin: bottom left;
+}
+
+#ytsm-root[data-position="left"] .ytsm-panel {
+  right: auto;
+  left: 0;
+  transform-origin: bottom left;
+}
+
+/* Auto-hide keeps the pill invisible until the player is hovered or focused. */
+#ytsm-root[data-autohide="true"]:not([data-open="true"]) .ytsm-dock {
+  opacity: 0;
+}
+
+#ytsm-root[data-autohide="true"] .ytsm-dock:hover,
+#ytsm-root[data-autohide="true"] .ytsm-dock:focus-within,
+#ytsm-root[data-autohide="true"][data-open="true"] .ytsm-dock {
+  opacity: var(--ytsm-opacity);
 }
 
 /* --- collapsed pill --- */

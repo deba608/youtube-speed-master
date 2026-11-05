@@ -34,6 +34,30 @@
   const MAX_PRESETS = 12;
   const MAX_CHANNELS = 500;
   const CHANNEL_PATH = /^\/(?:@|channel\/|c\/|user\/)/;
+  const QUALITY_HEIGHTS = {
+    highres: 4320,
+    hd2880: 2880,
+    hd2160: 2160,
+    hd1440: 1440,
+    hd1080: 1080,
+    hd720: 720,
+    large: 480,
+    medium: 360,
+    small: 240,
+    tiny: 144,
+  };
+  const QUALITY_MODES = ['auto', 'max', 'fixed'];
+  const QUALITY_CAPS = [4320, 2160, 1440, 1080, 720, 480, 360];
+  const QUALITY_WRITE_INTERVAL = 2000;
+  const UI_DEFAULTS = {
+    uiScale: 1,
+    uiOpacity: 1,
+    uiPosition: 'right',
+    uiAutoHide: false,
+    hotkeysEnabled: true,
+    hotkeyStep: 0.25,
+  };
+  const UI_KEYS = Object.keys(UI_DEFAULTS);
 
   // Content scripts can run twice (reload / bfcache); keep one engine per page.
   if (window.__ytSpeedMaster) return;
@@ -47,6 +71,12 @@
     channelKey: null,
     channelName: '',
     channelRates: {},
+    ui: { ...UI_DEFAULTS },
+    quality: {
+      mode: 'auto', // auto | max | fixed
+      cap: 1080, // used when mode === 'fixed'
+      lock: true, // keep YouTube from silently lowering the quality
+    },
     applying: false, // loop guard: true while we are the ones writing playbackRate
     video: null,
     ad: false,
@@ -54,6 +84,7 @@
 
   const listeners = new Set();
   let api = null;
+  let applyUiFn = () => {};
 
   const hasSyncStorage = typeof chrome !== 'undefined' && Boolean(chrome.storage?.sync);
   const hasLocalStorage = typeof chrome !== 'undefined' && Boolean(chrome.storage?.local);
@@ -128,6 +159,32 @@
 
   const isRemembered = () =>
     Boolean(state.channelKey && state.channelRates[state.channelKey]);
+
+  const clampNumber = (value, min, max, fallback) => {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return fallback;
+    return Math.min(max, Math.max(min, number));
+  };
+
+  const readUi = (items = {}) => ({
+    scale: clampNumber(items.uiScale, 0.8, 1.4, 1),
+    opacity: clampNumber(items.uiOpacity, 0.4, 1, 1),
+    position: items.uiPosition === 'left' ? 'left' : 'right',
+    autoHide: items.uiAutoHide === true,
+    hotkeysEnabled: items.hotkeysEnabled !== false,
+    step: clampNumber(items.hotkeyStep, 0.05, 0.5, 0.25),
+  });
+
+  const uiSnapshot = () => ({
+    uiScale: state.ui.scale,
+    uiOpacity: state.ui.opacity,
+    uiPosition: state.ui.position,
+    uiAutoHide: state.ui.autoHide,
+    hotkeysEnabled: state.ui.hotkeysEnabled,
+    hotkeyStep: state.ui.step,
+  });
+
+  const isShorts = () => /^\/shorts\//.test(location.pathname);
 
   const getVideo = () =>
     document.querySelector('video.html5-main-video') || document.querySelector('video');
@@ -359,6 +416,8 @@
         channelName: state.channelName,
         remembered: isRemembered(),
         presets: [...state.presets],
+        ui: { ...state.ui },
+        page: isShorts() ? 'shorts' : 'watch',
       };
     },
     apply,
@@ -490,6 +549,7 @@
             <span class="ytsm-hint">Shift+, / Shift+.</span>
           </div>
           <div class="ytsm-ad" hidden>Ad · 1x</div>
+          <span class="ytsm-sr" role="status" aria-live="polite"></span>
         </div>
         <button
           type="button"
@@ -511,9 +571,35 @@
     const rememberRow = root.querySelector('.ytsm-remember');
     const rememberBox = rememberRow.querySelector('input');
     const rememberText = rememberRow.querySelector('.ytsm-remember-text');
+    const hint = root.querySelector('.ytsm-hint');
+    const announce = root.querySelector('.ytsm-sr');
 
     let presetButtons = [];
     let presetSignature = '';
+    let lastAnnounced = '';
+
+    const applyUi = () => {
+      const ui = state.ui;
+      root.style.setProperty('--ytsm-scale', String(ui.scale));
+      root.style.setProperty('--ytsm-opacity', String(ui.opacity));
+      root.dataset.position = ui.position;
+      root.dataset.autohide = String(ui.autoHide);
+      root.dataset.page = isShorts() ? 'shorts' : 'watch';
+      root.dataset.uiScale = ui.scale.toFixed(2);
+      root.dataset.uiOpacity = ui.opacity.toFixed(2);
+      root.dataset.hotkeys = String(ui.hotkeysEnabled);
+      hint.textContent = ui.hotkeysEnabled
+        ? `Shift+, / Shift+. · ${ui.step.toFixed(2)}x`
+        : 'Hotkeys off';
+    };
+    applyUiFn = applyUi;
+    applyUi();
+
+    const announceRate = (label) => {
+      if (label === lastAnnounced) return;
+      lastAnnounced = label;
+      announce.textContent = `Playback speed ${label}`;
+    };
 
     const renderPresets = (list) => {
       const signature = list.join(',');
@@ -570,17 +656,24 @@
       root.dataset.remembered = String(info.remembered);
       root.dataset.presets = info.presets.join(',');
       root.dataset.extensionId = api.extensionId || '';
+      root.dataset.page = isShorts() ? 'shorts' : 'watch';
+      announceRate(label);
     };
 
-    const setOpen = (next) => {
+    const setOpen = (next, { focus = false } = {}) => {
       open = Boolean(next);
       root.dataset.open = String(open);
       toggle.setAttribute('aria-expanded', String(open));
-      if (open) sync(api.info());
+      if (open) {
+        sync(api.info());
+        if (focus) slider.focus({ preventScroll: true });
+      } else if (focus) {
+        toggle.focus({ preventScroll: true });
+      }
     };
 
     toggle.addEventListener('click', () => setOpen(!open));
-    close.addEventListener('click', () => setOpen(false));
+    close.addEventListener('click', () => setOpen(false, { focus: true }));
     slider.addEventListener('pointerdown', () => {
       dragging = true;
     });
@@ -625,25 +718,35 @@
     document.addEventListener(
       'keydown',
       (event) => {
-        if (event.key === 'Escape' && open) setOpen(false);
+        if (event.key === 'Escape' && open) setOpen(false, { focus: true });
       },
       true
     );
 
-    // Shift+. / Shift+, → ±0.25x (inside the 0.25–4 UI range).
+    // Shift+. / Shift+, → step by the configured amount (inside 0.25–4x).
+    // Shift+0 → 1x. Shift+1…4 → 1x, 2x, 3x, 4x.
     document.addEventListener(
       'keydown',
       (event) => {
         if (event.defaultPrevented || event.isComposing) return;
+        if (!state.ui.hotkeysEnabled) return;
         if (event.altKey || event.ctrlKey || event.metaKey || !event.shiftKey) return;
         if (isTypingTarget(event.target)) return;
 
+        const step = state.ui.step;
         const faster = event.code === 'Period' || event.key === '>';
         const slower = event.code === 'Comma' || event.key === '<';
-        if (!faster && !slower) return;
+        if (faster || slower) {
+          event.preventDefault();
+          api.setRate(clampUiRate(api.getRate() + (faster ? step : -step)));
+          return;
+        }
 
+        const digit = /^Digit([0-4])$/.exec(event.code);
+        if (!digit) return;
+        const value = Number(digit[1]);
         event.preventDefault();
-        api.setRate(clampUiRate(api.getRate() + (faster ? 0.25 : -0.25)));
+        api.setRate(value === 0 ? 1 : value);
       },
       true
     );
@@ -662,11 +765,13 @@
     };
     ensureMounted();
     document.addEventListener('yt-navigate-finish', () => {
+      applyUi();
       refreshChannel();
       ensureMounted();
     });
     window.setInterval(() => {
       ensureMounted();
+      applyUi();
       refreshChannel();
     }, 1000);
 
@@ -683,10 +788,12 @@
         state.presets = sanitizePresets(items.presets);
         state.preservesPitch = items.preservesPitch !== false;
         state.channelRates = sanitizeChannels(channels);
+        state.ui = readUi(items);
         state.desired = state.defaultRate;
       } finally {
         suppressPersist = false;
       }
+      applyUiFn();
       refreshChannel({ force: true });
     };
 
@@ -696,7 +803,7 @@
     }
 
     chrome.storage.sync.get(
-      { defaultRate: 1, preservesPitch: true, presets: DEFAULT_PRESETS },
+      { defaultRate: 1, preservesPitch: true, presets: DEFAULT_PRESETS, ...UI_DEFAULTS },
       (items) => {
         if (chrome.runtime.lastError) {
           console.warn(`${LOG_PREFIX} could not load settings`, chrome.runtime.lastError.message);
@@ -738,6 +845,14 @@
           }
           if (changes.presets) {
             state.presets = sanitizePresets(changes.presets.newValue);
+          }
+          if (UI_KEYS.some((key) => changes[key])) {
+            const next = uiSnapshot();
+            for (const key of UI_KEYS) {
+              if (changes[key]) next[key] = changes[key].newValue;
+            }
+            state.ui = readUi(next);
+            applyUiFn();
           }
         } else if (area === 'local' && changes.channelRates) {
           state.channelRates = sanitizeChannels(changes.channelRates.newValue);
