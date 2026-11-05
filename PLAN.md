@@ -245,11 +245,12 @@ Compress-Archive -Path .\manifest.json, .\src, .\icons -DestinationPath .\dist\y
 - [x] Extension name: **Speed Master** (repo: *YouTube-Speed-Master*; store name avoids the YouTube trademark)
 - [x] Default max on slider: **4x** (console API goes to 16x for power users)
 - [x] Overlay: compact speed pill always available, full panel on click / hotkey
-- [ ] Include per-channel memory in v1, or defer to v1.1?
+- [x] Per-channel memory: defer to **1.1.0** (see [ROADMAP.md](ROADMAP.md))
 - [x] Privacy policy host: GitHub Pages (`docs/` on `main`)
 
 ---
 
 ## 9. Next Action
 
-Start **P0**: scaffold `manifest.json`, `src/content.js` stub, and 4 icon files → load unpacked in Chrome.
+v1.0.0 is released; Chrome Web Store submission is the only open P6 step
+([store/PUBLISH.md](store/PUBLISH.md)). Feature work starts at **1.1.0** in [ROADMAP.md](ROADMAP.md).
