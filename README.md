@@ -6,8 +6,10 @@ Chrome extension (Manifest V3) that unlocks YouTube playback speed beyond the bu
 
 ## Status
 
-**P6 — Publishing.** v1.0.0 is packaged and documented; the only remaining step is the developer
-dashboard (account, upload, submit). Walkthrough: [store/PUBLISH.md](store/PUBLISH.md).
+**P6 — Publishing.** v1.0.0 is packaged, released on GitHub and documented; the only remaining step
+is the developer dashboard (account, upload, submit).
+[Download v1.0.0](https://github.com/deba608/youtube-speed-master/releases/tag/v1.0.0) ·
+Walkthrough: [store/PUBLISH.md](store/PUBLISH.md).
 
 Roadmap and design notes: [PLAN.md](PLAN.md).
 
@@ -17,10 +19,11 @@ Roadmap and design notes: [PLAN.md](PLAN.md).
 
 **From the store:** Chrome Web Store → **Add to Chrome** → pin the icon.
 
-**From a ZIP (pre-release / development):** extract
-`dist/youtube-speed-master-1.0.0.zip`, then `chrome://extensions` → enable **Developer mode** →
-**Load unpacked** → select the extracted folder that directly contains `manifest.json` → open a
-YouTube video. The console should log `[Speed Master] ready`.
+**From a ZIP (pre-release / development):** download
+[`youtube-speed-master-1.0.0.zip`](https://github.com/deba608/youtube-speed-master/releases/latest/download/youtube-speed-master-1.0.0.zip)
+and extract it, then `chrome://extensions` → enable **Developer mode** → **Load unpacked** → select
+the extracted folder that directly contains `manifest.json` → open a YouTube video. The console
+should log `[Speed Master] ready`.
 
 Step-by-step install (store, ZIP, Edge/Brave): [GUIDE.md](GUIDE.md#install).
 

@@ -28,7 +28,9 @@ optional reading.
 
 Two ZIPs work; both must be extracted first — Chrome cannot load a `.zip`.
 
-- **Packaged build** (recommended, only runtime files): `dist/youtube-speed-master-1.0.0.zip`
+- **Packaged build** (recommended, only runtime files):
+  [`youtube-speed-master-1.0.0.zip`](https://github.com/deba608/youtube-speed-master/releases/latest/download/youtube-speed-master-1.0.0.zip)
+  — or run `npm run package` in a clone to produce `dist/youtube-speed-master-1.0.0.zip`
 - **Repository source**: GitHub → **Code** → **Download ZIP**
 
 1. Extract the ZIP to a permanent folder, e.g. `C:\Users\Dev\Speed-Master`.
