@@ -24,21 +24,30 @@ optional reading.
 
 > The listing goes live with the P6 release. Until then use Option B.
 
-### Option B — Load unpacked (pre-release or development)
+### Option B — From a ZIP (no store)
 
-Use this to run the current build before the store listing is public.
+Two ZIPs work; both must be extracted first — Chrome cannot load a `.zip`.
 
-1. Download or clone this repository.
+- **Packaged build** (recommended, only runtime files): `dist/youtube-speed-master-1.0.0.zip`
+- **Repository source**: GitHub → **Code** → **Download ZIP**
+
+1. Extract the ZIP to a permanent folder, e.g. `C:\Users\Dev\Speed-Master`.
+   - The packaged ZIP extracts flat: `manifest.json` sits at the top level.
+   - The GitHub ZIP adds a nesting level (`youtube-speed-master-main\youtube-speed-master-main\`),
+     so open it and use the inner folder.
 2. Open `chrome://extensions` in a new tab.
 3. Turn on **Developer mode** (top-right toggle).
 4. Click **Load unpacked**.
-5. Select the repository folder — the one containing `manifest.json`.
+5. Select the folder that **directly contains `manifest.json`** — not its parent.
 6. The **Speed Master** card appears. Pin it if you want the popup in the toolbar.
 7. Open a YouTube video and check the console on that tab: it should log
    `[Speed Master] ready`.
 
-The extension stays installed until you remove it or delete the folder. After pulling changes,
-press the reload icon on the extension card, then reload the YouTube tab.
+Keep the extracted folder where it is: Chrome reads it on every launch. After replacing the files
+with a newer build, press the reload icon on the extension card, then reload the YouTube tab.
+
+If Chrome says **“Manifest file is missing or unreadable”**, you selected the parent folder — go one
+level down to the folder holding `manifest.json`.
 
 ### Option C — Microsoft Edge
 
@@ -151,6 +160,7 @@ Nothing leaves your browser except Chrome's own profile sync, if you have it ena
 | Panel is hidden behind player controls | Hover the player so the controls fade, or use fullscreen. |
 | Settings did not carry to another computer | Chrome sync must be on for the profile; check `chrome://settings/syncSetup`. |
 | `[Speed Master] ready` not in console | The extension is disabled or not loaded. Check `chrome://extensions` for errors. |
+| `Manifest file is missing or unreadable` | You selected the folder **above** the one with `manifest.json` — GitHub ZIPs extract with an extra nesting level. Select the folder that directly contains `manifest.json`, or extract `dist/youtube-speed-master-<version>.zip` and select that folder. |
 | Extension missing after a Chrome update | Chrome disables unpacked extensions occasionally — re-enable it on `chrome://extensions`. |
 
 Still stuck? Open an issue with your Chrome version, the video URL and any console errors:

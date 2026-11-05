@@ -17,11 +17,12 @@ Roadmap and design notes: [PLAN.md](PLAN.md).
 
 **From the store:** Chrome Web Store → **Add to Chrome** → pin the icon.
 
-**Pre-release / development:** `chrome://extensions` → enable **Developer mode** →
-**Load unpacked** → select this folder → open a YouTube video. The console should log
-`[Speed Master] ready`.
+**From a ZIP (pre-release / development):** extract
+`dist/youtube-speed-master-1.0.0.zip`, then `chrome://extensions` → enable **Developer mode** →
+**Load unpacked** → select the extracted folder that directly contains `manifest.json` → open a
+YouTube video. The console should log `[Speed Master] ready`.
 
-Full install steps and Edge/Brave notes: [GUIDE.md](GUIDE.md#install).
+Step-by-step install (store, ZIP, Edge/Brave): [GUIDE.md](GUIDE.md#install).
 
 ## Use
 
