@@ -11,23 +11,23 @@ Use this as a keystroke-level walkthrough of the developer dashboard.
 
 | Check | Result |
 |---|---|
-| Upload artifact | `dist/youtube-speed-master-1.0.0.zip` — 19,994 bytes |
-| SHA-256 | `CAF27DFC309B7D6012EEA86FF90CAC01C751F9B1885E42F2A5FB8F846FA537ED` |
+| Upload artifact | `dist/youtube-speed-master-1.1.0.zip` — 25,233 bytes |
+| SHA-256 | `5991A34781A5112688658CDC48A74F87335608257F24AC6F4FCC477FFC820570` |
 | ZIP entries | 10, forward-slash names, `manifest.json` at root, no dev files |
-| Manifest | MV3, name **Speed Master**, version **1.0.0** |
+| Manifest | MV3, name **Speed Master**, version **1.1.0** |
 | Permissions | `storage` only + content script on `*://*.youtube.com/*` |
 | Remote code | none — all JS bundled |
 | Privacy URL | <https://deba608.github.io/youtube-speed-master/privacy.html> (HTTP 200) |
 | Homepage | <https://deba608.github.io/youtube-speed-master/> (HTTP 200) |
 | Screenshots | 3 × 1280×800 in `store/` |
 | Promo tile | 440×280 in `store/` |
-| Automated QA | 23/23 local, 26/26 with real YouTube smoke |
+| Automated QA | 43/43 local, 46/46 with real YouTube smoke |
 
 Rebuild and re-hash before uploading if anything changed since:
 
 ```powershell
 npm run package
-(Get-FileHash .\dist\youtube-speed-master-1.0.0.zip -Algorithm SHA256).Hash
+(Get-FileHash .\dist\youtube-speed-master-1.1.0.zip -Algorithm SHA256).Hash
 ```
 
 ---
@@ -48,8 +48,8 @@ npm run package
 ## 2. Create the item and upload
 
 1. Dashboard → **New item**.
-2. Upload `dist/youtube-speed-master-1.0.0.zip`.
-3. Confirm the parsed manifest shows name **Speed Master**, version **1.0.0**, one permission
+2. Upload `dist/youtube-speed-master-1.1.0.zip`.
+3. Confirm the parsed manifest shows name **Speed Master**, version **1.1.0**, one permission
    (`storage`) and a content script.
 4. If the upload errors on the manifest, re-run `npm run package` and retry — never hand-zip, the
    entry names must use forward slashes.
@@ -180,7 +180,7 @@ npm run qa
 - [ ] Install from the store into a clean profile, run through
       [GUIDE.md](../GUIDE.md#first-run), confirm the pill appears.
 - [ ] Add the store link to `README.md` and `docs/index.html`.
-- [ ] Tag the release: `git tag v1.0.0 && git push --tags`.
+- [ ] Tag the release: `git tag v1.1.0 && git push --tags`.
 - [ ] Watch the developer dashboard for `chrome://extensions` error reports and reviews for the
       first week.
 
