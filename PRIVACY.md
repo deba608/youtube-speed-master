@@ -1,8 +1,8 @@
-# Privacy Policy — YouTube Speed Master
+# Privacy Policy — Speed Master
 
 **Last updated:** 2026-11-05
 
-YouTube Speed Master does not collect, transmit, sell or share any user data.
+Speed Master does not collect, transmit, sell or share any user data.
 
 ## What is stored
 
