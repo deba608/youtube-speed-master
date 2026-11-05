@@ -25,7 +25,7 @@
 (() => {
   'use strict';
 
-  const LOG_PREFIX = '[YouTube Speed Master]';
+  const LOG_PREFIX = '[Speed Master]';
   const MIN_RATE = 0.0625; // Chromium lower bound
   const MAX_RATE = 16; // Chromium upper bound
   const UI_MIN_RATE = 0.25;

@@ -11,6 +11,18 @@ Chrome extension (Manifest V3) that unlocks YouTube playback speed beyond the bu
 
 Roadmap and design notes: [PLAN.md](PLAN.md).
 
+**New here?** [GUIDE.md](GUIDE.md) covers install, controls, settings and troubleshooting.
+
+## Install
+
+**From the store:** Chrome Web Store → **Add to Chrome** → pin the icon.
+
+**Pre-release / development:** `chrome://extensions` → enable **Developer mode** →
+**Load unpacked** → select this folder → open a YouTube video. The console should log
+`[Speed Master] ready`.
+
+Full install steps and Edge/Brave notes: [GUIDE.md](GUIDE.md#install).
+
 ## Use
 
 - Click the toolbar icon → set a default speed (0.25x–4x), presets, pitch, reset.
@@ -21,6 +33,7 @@ Roadmap and design notes: [PLAN.md](PLAN.md).
 - Ads always play at 1x; the panel shows an `Ad · 1x` badge.
 
 Speed and pitch are stored in `chrome.storage.sync` — no account, no network calls.
+Full user guide: [GUIDE.md](GUIDE.md).
 
 ## Load unpacked (dev)
 
@@ -28,7 +41,7 @@ Speed and pitch are stored in `chrome.storage.sync` — no account, no network c
 2. Enable **Developer mode**
 3. **Load unpacked** → select this folder
 4. Visit any `youtube.com/watch?v=...` page
-5. DevTools console should log `[YouTube Speed Master] ready`
+5. DevTools console should log `[Speed Master] ready`
 
 After editing `content.js`: click the reload icon on the extension card, then reload the
 YouTube tab.
@@ -98,6 +111,7 @@ scripts/          icon generator, packager, dev harnesses
 tests/            Playwright QA + manual checklist
 store/            listing copy, screenshots, promo tile
 docs/             GitHub Pages site (privacy policy)
+GUIDE.md          user guide: install, controls, troubleshooting
 ```
 
 ## Regenerate icons
