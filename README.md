@@ -176,6 +176,8 @@ The extension is MV3, requests only the `storage` permission, and runs a content
 | `npm run assets` | Re-render store screenshots and the promo tile |
 | `npm run icons` | Regenerate the 16/32/48/128 px icons |
 
+The packaging and icon scripts use PowerShell; the QA and asset scripts are cross-platform.
+
 Dev harnesses (`scripts/engine-harness.html`, `scripts/storage-harness.html` and
 `scripts/popup-harness.html`) exercise the real source without loading the extension. Serve the
 repository root with any static server, then open the harness paths.
@@ -231,7 +233,7 @@ store/              listing copy, publishing guide, screenshots, promo tile
 docs/               GitHub Pages site (landing + privacy policy)
 GUIDE.md            user guide: install, controls, troubleshooting
 ROADMAP.md          post-1.0 feature plan
-PLAN.md             roadmap and design notes
+PLAN.md             original plan and design notes
 CHANGELOG.md        release history
 PRIVACY.md          privacy policy
 ```
