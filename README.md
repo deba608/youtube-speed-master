@@ -122,6 +122,10 @@ GUIDE.md          user guide: install, controls, troubleshooting
 powershell -ExecutionPolicy Bypass -File .\scripts\make-icons.ps1
 ```
 
+## Changelog
+
+Release history: [CHANGELOG.md](CHANGELOG.md).
+
 ## Privacy
 
 No data collected. See [PRIVACY.md](PRIVACY.md).
