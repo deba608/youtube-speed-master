@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Speed Master — store assets</title>
+    <link rel="stylesheet" href="../../src/overlay.css" />
+    <link rel="stylesheet" href="../../src/popup.css" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #080b11;
+        --panel: #10151f;
+        --fg: #f4f7fb;
+        --muted: #93a0b4;
+        --accent: #2dd4bf;
+        --accent-strong: #5eead4;
+        --border: rgba(255, 255, 255, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+
+      body[data-shot="promo"] {
+        background: radial-gradient(120% 120% at 10% 10%, #123 0%, #080b11 55%);
+      }
+
+      .glow {
+        position: fixed;
+        width: 720px;
+        height: 720px;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.35;
+        pointer-events: none;
+      }
+      .glow-a {
+        top: -380px;
+        left: -220px;
+        background: #0f766e;
+      }
+      .glow-b {
+        right: -320px;
+        bottom: -420px;
+        background: #1d4ed8;
+      }
+
+      .stage {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        padding: 56px 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .shot {
+        display: none;
+        width: 100%;
+      }
+
+      body[data-shot="1"] .shot-1,
+      body[data-shot="2"] .shot-2,
+      body[data-shot="3"] .shot-3,
+      body[data-shot="promo"] .shot-promo {
+        display: flex;
+      }
+
+      /* ---------- shared type ---------- */
+
+      .copy h1,
+      .copy-narrow h1 {
+        margin: 0;
+        font-size: 64px;
+        line-height: 1.02;
+        letter-spacing: -0.03em;
+        font-weight: 800;
+      }
+
+      .copy h1 em,
+      .copy-narrow h1 em {
+        color: var(--accent-strong);
+        font-style: normal;
+      }
+
+      .sub {
+        margin: 20px 0 0;
+        max-width: 440px;
+        color: var(--muted);
+        font-size: 19px;
+        line-height: 1.5;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 22px;
+        padding: 7px 13px;
+        border: 1px solid rgba(45, 212, 191, 0.35);
+        border-radius: 999px;
+        background: rgba(45, 212, 191, 0.1);
+        color: var(--accent-strong);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 28px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .chips li {
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        color: #dbe4f0;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      /* ---------- shot 1: hero ---------- */
+
+      .shot-1 {
+        align-items: center;
+        justify-content: space-between;
+        gap: 48px;
+      }
+
+      .copy {
+        flex: 0 0 460px;
+      }
+
+      .player {
+        position: relative;
+        flex: 0 0 660px;
+        aspect-ratio: 16 / 9;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        background: #000;
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.55);
+        overflow: hidden;
+      }
+
+      .player .frame {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(80% 110% at 20% 15%, rgba(45, 212, 191, 0.4) 0%, transparent 55%),
+          radial-gradient(90% 120% at 85% 90%, rgba(29, 78, 216, 0.45) 0%, transparent 60%),
+          linear-gradient(135deg, #0b1220 0%, #111a2b 55%, #0a0f18 100%);
+      }
+
+      .player .frame::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+        background-size: 28px 28px;
+        opacity: 0.25;
+      }
+
+      .player .title {
+        position: absolute;
+        left: 22px;
+        top: 18px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .player .title i {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+
+      .player .controls {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 44px;
+        padding: 0 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent);
+      }
+
+      .player .progress {
+        flex: 1;
+        height: 4px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.2);
+        overflow: hidden;
+      }
+
+      .player .progress span {
+        display: block;
+        width: 46%;
+        height: 100%;
+        background: #f8fafc;
+      }
+
+      .player .time {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 11px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* start the injected UI higher than the mock controls */
+      .player #ytsm-root {
+        bottom: 58px;
+        right: 14px;
+      }
+
+      /* ---------- shot 2: popup ---------- */
+
+      .shot-2 {
+        align-items: center;
+        justify-content: center;
+        gap: 80px;
+      }
+
+      .popup-wrap {
+        position: relative;
+        transform: scale(1.32);
+        transform-origin: center;
+      }
+
+      .popup-card {
+        width: 300px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--bg);
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+        overflow: hidden;
+      }
+
+      .callout {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 0 18px;
+        color: var(--muted);
+        font-size: 15px;
+      }
+
+      .callout b {
+        color: var(--fg);
+        font-weight: 700;
+      }
+
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+        flex: none;
+      }
+
+      .copy-narrow {
+        max-width: 430px;
+      }
+
+      .copy-narrow h1 {
+        font-size: 46px;
+      }
+
+      /* ---------- shot 3: hotkeys ---------- */
+
+      .shot-3 {
+        align-items: center;
+        justify-content: space-between;
+        gap: 60px;
+      }
+
+      .keys {
+        flex: 0 0 520px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .key-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 22px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .key-row .combo {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .keys kbd {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        padding: 0 12px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-bottom-width: 3px;
+        border-radius: 9px;
+        background: #151b26;
+        color: var(--fg);
+        font: 600 15px/1 system-ui, sans-serif;
+      }
+
+      .key-row .effect {
+        color: var(--accent-strong);
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .mini-player {
+        position: relative;
+        flex: 0 0 520px;
+        aspect-ratio: 16 / 10;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 18px;
+        background:
+          radial-gradient(70% 100% at 25% 20%, rgba(45, 212, 191, 0.35), transparent 60%),
+          linear-gradient(150deg, #0b1220, #101a2c 70%, #080d15);
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+      }
+
+      .mini-player #ytsm-root {
+        bottom: 26px;
+        right: 22px;
+      }
+
+      .mini-player .hint {
+        position: absolute;
+        left: 24px;
+        bottom: 28px;
+        color: rgba(255, 255, 255, 0.45);
+        font-size: 12px;
+      }
+
+      /* ---------- promo ---------- */
+
+      body[data-shot="promo"] .stage {
+        padding: 0;
+      }
+
+      body[data-shot="promo"] .glow {
+        display: none;
+      }
+
+      .shot-promo {
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        padding: 0 28px;
+      }
+
+      .promo-icon {
+        flex: none;
+        width: 88px;
+        height: 88px;
+        border-radius: 20px;
+        box-shadow: 0 24px 50px rgba(0, 0, 0, 0.55);
+      }
+
+      .promo-text h1 {
+        font-size: 34px;
+        letter-spacing: -0.02em;
+      }
+
+      .promo-text p {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .promo-text .tag {
+        display: inline-block;
+        margin-top: 12px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: rgba(45, 212, 191, 0.12);
+        color: var(--accent-strong);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body data-shot="1">
+    <div class="glow glow-a"></div>
+    <div class="glow glow-b"></div>
+
+    <div class="stage">
+      <!-- 1. hero: player with panel open -->
+      <section class="shot shot-1">
+        <div class="copy">
+          <span class="badge">Chrome extension</span>
+          <h1>Play YouTube<br /><em>up to 4x</em></h1>
+          <p class="sub">
+            Break the built-in 2x cap. A slider, presets and hotkeys — with pitch kept natural.
+          </p>
+          <ul class="chips">
+            <li>0.25x – 4x</li>
+            <li>Pitch preserved</li>
+            <li>No tracking</li>
+          </ul>
+        </div>
+
+        <div class="player">
+          <div class="frame"></div>
+          <div class="title"><i></i> Lecture — Introduction to Systems</div>
+          <div class="controls">
+            <div class="progress"><span></span></div>
+            <div class="time">18:24 / 42:10</div>
+          </div>
+
+          <div id="ytsm-root" data-open="true">
+            <div class="ytsm-dock">
+              <div class="ytsm-panel" id="ytsm-panel" role="group" aria-label="Playback speed controls">
+                <div class="ytsm-head">
+                  <span class="ytsm-title">Playback speed</span>
+                  <span class="ytsm-value">2.50x</span>
+                  <button type="button" class="ytsm-close" aria-label="Close speed panel">✕</button>
+                </div>
+                <input
+                  class="ytsm-slider"
+                  type="range"
+                  min="0.25"
+                  max="4"
+                  step="0.05"
+                  value="2.5"
+                  aria-label="Playback speed"
+                  style="--ytsm-fill: 60%"
+                />
+                <div class="ytsm-presets" role="group" aria-label="Speed presets">
+                  <button type="button" class="ytsm-preset">0.5x</button>
+                  <button type="button" class="ytsm-preset">0.75x</button>
+                  <button type="button" class="ytsm-preset">1x</button>
+                  <button type="button" class="ytsm-preset">1.25x</button>
+                  <button type="button" class="ytsm-preset">1.5x</button>
+                  <button type="button" class="ytsm-preset">1.75x</button>
+                  <button type="button" class="ytsm-preset">2x</button>
+                  <button type="button" class="ytsm-preset is-active">2.5x</button>
+                  <button type="button" class="ytsm-preset">3x</button>
+                  <button type="button" class="ytsm-preset">3.5x</button>
+                  <button type="button" class="ytsm-preset">4x</button>
+                </div>
+                <div class="ytsm-foot">
+                  <label class="ytsm-pitch">
+                    <input type="checkbox" checked />
+                    <span>Keep pitch</span>
+                  </label>
+                  <span class="ytsm-hint">Shift+, / Shift+.</span>
+                </div>
+                <div class="ytsm-ad" hidden>Ad · 1x</div>
+              </div>
+              <button type="button" class="ytsm-toggle">2.50x</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. popup settings -->
+      <section class="shot shot-2">
+        <div class="copy copy-narrow">
+          <span class="badge">Settings</span>
+          <h1>Set it once.<br /><em>Keep it.</em></h1>
+          <p class="sub">Pick a default speed and pitch preference. It loads on every video, every tab.</p>
+          <div style="margin-top: 30px">
+            <div class="callout"><span class="dot"></span><span><b>Synced</b> through your Chrome profile</span></div>
+            <div class="callout"><span class="dot"></span><span><b>Remembered</b> across restarts</span></div>
+            <div class="callout"><span class="dot"></span><span><b>Private</b> — no servers, no analytics</span></div>
+          </div>
+        </div>
+
+        <div class="popup-wrap">
+          <div class="popup-card">
+            <main class="popup">
+              <header class="head">
+                <img class="logo" src="../../icons/icon48.png" width="26" height="26" alt="" />
+                <div class="head-text">
+                  <h1>Speed Master</h1>
+                  <p class="muted">Default speed for every video</p>
+                </div>
+                <span class="saved">Saved</span>
+              </header>
+
+              <div class="speed-row">
+                <output>2.50x</output>
+                <button class="reset" type="button">Reset 1x</button>
+              </div>
+
+              <input
+                class="slider"
+                type="range"
+                min="0.25"
+                max="4"
+                step="0.05"
+                value="2.5"
+                style="--fill: 60%"
+                aria-label="Default playback speed"
+              />
+
+              <div class="presets" role="group" aria-label="Speed presets">
+                <button type="button" class="preset">0.5x</button>
+                <button type="button" class="preset">0.75x</button>
+                <button type="button" class="preset">1x</button>
+                <button type="button" class="preset">1.25x</button>
+                <button type="button" class="preset">1.5x</button>
+                <button type="button" class="preset">1.75x</button>
+                <button type="button" class="preset">2x</button>
+                <button type="button" class="preset is-active">2.5x</button>
+                <button type="button" class="preset">3x</button>
+                <button type="button" class="preset">3.5x</button>
+                <button type="button" class="preset">4x</button>
+              </div>
+
+              <label class="switch-row">
+                <span class="switch-text">Keep pitch<small>Natural audio at high speeds</small></span>
+                <input type="checkbox" checked />
+              </label>
+
+              <p class="note">
+                In the player: click the speed pill, or press <kbd>Shift</kbd> + <kbd>.</kbd> /
+                <kbd>Shift</kbd> + <kbd>,</kbd>
+              </p>
+            </main>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. hotkeys -->
+      <section class="shot shot-3">
+        <div class="copy-narrow">
+          <span class="badge">Hotkeys</span>
+          <h1>Change speed<br /><em>without aiming.</em></h1>
+          <p class="sub">Step through speeds while the video keeps playing. No menus, no clicks.</p>
+          <div class="keys">
+            <div class="key-row">
+              <span class="combo"><kbd>Shift</kbd><kbd>.</kbd></span>
+              <span class="effect">+0.25x faster</span>
+            </div>
+            <div class="key-row">
+              <span class="combo"><kbd>Shift</kbd><kbd>,</kbd></span>
+              <span class="effect">−0.25x slower</span>
+            </div>
+            <div class="key-row">
+              <span class="combo"><kbd>Esc</kbd></span>
+              <span class="effect">Close the panel</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mini-player">
+          <div class="hint">3.00x · pitch preserved</div>
+          <div id="ytsm-root" data-open="false">
+            <div class="ytsm-dock">
+              <div class="ytsm-panel" id="ytsm-panel" role="group" aria-label="Playback speed controls">
+                <div class="ytsm-head">
+                  <span class="ytsm-title">Playback speed</span>
+                  <span class="ytsm-value">3.00x</span>
+                  <button type="button" class="ytsm-close" aria-label="Close speed panel">✕</button>
+                </div>
+                <input class="ytsm-slider" type="range" min="0.25" max="4" step="0.05" value="3" style="--ytsm-fill: 73%" />
+                <div class="ytsm-presets">
+                  <button type="button" class="ytsm-preset">0.5x</button>
+                  <button type="button" class="ytsm-preset">0.75x</button>
+                  <button type="button" class="ytsm-preset">1x</button>
+                  <button type="button" class="ytsm-preset">1.25x</button>
+                  <button type="button" class="ytsm-preset">1.5x</button>
+                  <button type="button" class="ytsm-preset">1.75x</button>
+                  <button type="button" class="ytsm-preset">2x</button>
+                  <button type="button" class="ytsm-preset">2.5x</button>
+                  <button type="button" class="ytsm-preset is-active">3x</button>
+                  <button type="button" class="ytsm-preset">3.5x</button>
+                  <button type="button" class="ytsm-preset">4x</button>
+                </div>
+                <div class="ytsm-foot">
+                  <label class="ytsm-pitch"><input type="checkbox" checked /><span>Keep pitch</span></label>
+                  <span class="ytsm-hint">Shift+, / Shift+.</span>
+                </div>
+              </div>
+              <button type="button" class="ytsm-toggle">3.00x</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- promo tile -->
+      <section class="shot shot-promo">
+        <img class="promo-icon" src="../../icons/icon128.png" alt="" />
+        <div class="promo-text">
+          <h1>Speed Master</h1>
+          <p>0.25x – 4x playback for YouTube</p>
+          <span class="tag">Chrome extension</span>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const shot = new URLSearchParams(location.search).get('shot') || '1';
+      document.body.dataset.shot = shot;
+      document.querySelectorAll('#ytsm-root').forEach((root, index) => {
+        if (shot === '1' && index === 0) root.dataset.open = 'true';
+      });
+      // Make the hero slider fill and panel state deterministic for screenshots.
+      document.querySelectorAll('.ytsm-slider, .slider').forEach((slider) => {
+        const min = Number(slider.min);
+        const max = Number(slider.max);
+        const percent = ((Number(slider.value) - min) / (max - min)) * 100;
+        slider.style.setProperty(slider.classList.contains('ytsm-slider') ? '--ytsm-fill' : '--fill', percent + '%');
+      });
+    </script>
+  </body>
+</html>
