@@ -33,15 +33,15 @@ v.playbackRate = 3;        // override the 2x cap
 ## 2. Feature Scope
 
 ### MVP (v1.0) — ship this
-- [ ] Floating overlay panel inside the YouTube player
-- [ ] Slider: 0.25x – 4x, step 0.05
-- [ ] Preset buttons: 0.5 / 0.75 / 1 / 1.25 / 1.5 / 1.75 / 2 / 2.5 / 3 / 3.5 / 4
-- [ ] `Shift + .` / `Shift + ,` → step ±0.25 (beats native 2x limit)
-- [ ] Popup: set global default speed
-- [ ] Persist with `chrome.storage.sync`
-- [ ] Auto-apply on every new video, survive SPA navigation
-- [ ] Pitch preservation on/off
-- [ ] Show current speed on the panel
+- [x] Floating overlay panel inside the YouTube player
+- [x] Slider: 0.25x – 4x, step 0.05
+- [x] Preset buttons: 0.5 / 0.75 / 1 / 1.25 / 1.5 / 1.75 / 2 / 2.5 / 3 / 3.5 / 4
+- [x] `Shift + .` / `Shift + ,` → step ±0.25 (beats native 2x limit)
+- [x] Popup: set global default speed
+- [x] Persist with `chrome.storage.sync`
+- [x] Auto-apply on every new video, survive SPA navigation
+- [x] Pitch preservation on/off
+- [x] Show current speed on the panel
 
 ### v1.1 — polish
 - [ ] Per-video speed memory (keyed by video ID)

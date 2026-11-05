@@ -6,18 +6,22 @@ Chrome extension (Manifest V3) that unlocks YouTube playback speed beyond the bu
 
 ## Status
 
-**P2 — Overlay UI.** Floating speed pill + panel inside the player, slider 0.25x–4x (step 0.05),
-11 presets, pitch toggle and `Shift+.` / `Shift+,` hotkeys. Settings are not persisted yet (P3).
+**P3 — Settings.** Popup sets the global default speed and pitch preference; both persist in
+`chrome.storage.sync`, survive restarts and sync across Chrome profiles. In-page changes (slider,
+presets, hotkeys) update the saved default too.
 
 Roadmap and design notes: [PLAN.md](PLAN.md).
 
 ## Use
 
+- Click the toolbar icon → set a default speed (0.25x–4x), presets, pitch, reset.
 - Click the speed pill (bottom-right of the player) to open the panel.
 - Drag the slider or hit a preset (0.5x … 4x).
 - `Shift + .` → faster by 0.25x, `Shift + ,` → slower by 0.25x.
 - `Esc` or a click outside closes the panel.
 - Ads always play at 1x; the panel shows an `Ad · 1x` badge.
+
+Speed and pitch are stored in `chrome.storage.sync` — no account, no network calls.
 
 ## Load unpacked (dev)
 
@@ -25,7 +29,7 @@ Roadmap and design notes: [PLAN.md](PLAN.md).
 2. Enable **Developer mode**
 3. **Load unpacked** → select this folder
 4. Visit any `youtube.com/watch?v=...` page
-5. DevTools console should log `[YouTube Speed Master] ready (P2)`
+5. DevTools console should log `[YouTube Speed Master] ready (P3)`
 
 After editing `content.js`: click the reload icon on the extension card, then reload the
 YouTube tab.

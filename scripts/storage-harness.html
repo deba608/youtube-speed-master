@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>YouTube Speed Master — storage harness</title>
+    <link rel="stylesheet" href="/src/overlay.css" />
+    <style>
+      body { font: 14px/1.5 system-ui, sans-serif; margin: 24px; background: #0f1115; color: #f2f4f8; }
+      video { width: 320px; background: #000; }
+      pre { background: #171b24; padding: 12px; border-radius: 8px; }
+    </style>
+  </head>
+  <body>
+    <h1>Storage harness</h1>
+    <p>Seeds <code>chrome.storage.sync</code> with 2.25x / pitch off before loading the content script.</p>
+
+    <div id="movie_player" class="html5-video-player">
+      <video id="v" class="html5-main-video"></video>
+    </div>
+
+    <pre id="out">waiting…</pre>
+
+    <script>
+      // Minimal chrome.storage.sync stand-in so the content script can be tested off-extension.
+      (() => {
+        const store = { defaultRate: 2.25, preservesPitch: false };
+        const listeners = [];
+        window.__store = store;
+        window.__emitStorageChange = (patch) => {
+          const changes = {};
+          for (const [key, value] of Object.entries(patch)) {
+            changes[key] = { oldValue: store[key], newValue: value };
+            store[key] = value;
+          }
+          for (const listener of listeners) listener(changes, 'sync');
+        };
+        window.chrome = {
+          runtime: { lastError: undefined },
+          storage: {
+            sync: {
+              get(defaults, callback) {
+                setTimeout(() => callback({ ...defaults, ...store }), 10);
+              },
+              set(patch, callback) {
+                setTimeout(() => {
+                  Object.assign(store, patch);
+                  if (callback) callback();
+                }, 5);
+              },
+            },
+            onChanged: {
+              addListener(listener) {
+                listeners.push(listener);
+              },
+            },
+          },
+        };
+      })();
+    </script>
+    <script src="/src/content.js"></script>
+    <script>
+      document.getElementById('out').textContent = 'engine loaded: ' + Boolean(window.__ytSpeedMaster);
+    </script>
+  </body>
+</html>

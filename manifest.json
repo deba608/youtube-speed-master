@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YouTube Speed Master",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Unlock YouTube playback speed beyond 2x — up to 4x with one click, 16x custom.",
   "permissions": ["storage"],
   "action": {

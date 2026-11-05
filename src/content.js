@@ -48,6 +48,10 @@
   const listeners = new Set();
   let api = null;
 
+  const hasSyncStorage = typeof chrome !== 'undefined' && Boolean(chrome.storage?.sync);
+  let persistTimer = 0;
+  let suppressPersist = false;
+
   const clampRate = (value) => {
     const rate = Number(value);
     if (!Number.isFinite(rate)) return state.desired;
@@ -75,6 +79,28 @@
       }
     }
   }
+
+  const persist = () => {
+    if (!hasSyncStorage || suppressPersist) return;
+    clearTimeout(persistTimer);
+    persistTimer = window.setTimeout(() => {
+      try {
+        chrome.storage.sync.set(
+          { defaultRate: state.desired, preservesPitch: state.preservesPitch },
+          () => {
+            if (chrome.runtime.lastError) {
+              console.warn(
+                `${LOG_PREFIX} could not save settings`,
+                chrome.runtime.lastError.message
+              );
+            }
+          }
+        );
+      } catch (error) {
+        console.warn(`${LOG_PREFIX} could not save settings`, error);
+      }
+    }, 250);
+  };
 
   const setPitch = (video) => {
     const value = state.preservesPitch;
@@ -128,6 +154,7 @@
       if (Math.abs(next - state.desired) > EPSILON) {
         state.desired = next;
         notify();
+        persist();
       }
       apply();
       return state.desired;
@@ -138,6 +165,7 @@
       state.preservesPitch = Boolean(on);
       apply();
       notify();
+      persist();
       return state.preservesPitch;
     },
     enable: (on = true) => {
@@ -429,11 +457,46 @@
     return { root, setOpen };
   }
 
+  // --- Settings (chrome.storage.sync) ------------------------------------------
+
+  const loadSettings = () => {
+    if (!hasSyncStorage) return;
+    chrome.storage.sync.get({ defaultRate: 1, preservesPitch: true }, (items) => {
+      if (chrome.runtime.lastError) {
+        console.warn(`${LOG_PREFIX} could not load settings`, chrome.runtime.lastError.message);
+        return;
+      }
+      suppressPersist = true;
+      try {
+        api.setRate(items.defaultRate);
+        api.setPitch(Boolean(items.preservesPitch));
+      } finally {
+        suppressPersist = false;
+      }
+    });
+  };
+
+  const watchSettings = () => {
+    if (!hasSyncStorage) return;
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area !== 'sync') return;
+      suppressPersist = true;
+      try {
+        if (changes.defaultRate) api.setRate(changes.defaultRate.newValue);
+        if (changes.preservesPitch) api.setPitch(Boolean(changes.preservesPitch.newValue));
+      } finally {
+        suppressPersist = false;
+      }
+    });
+  };
+
   initUi();
+  loadSettings();
+  watchSettings();
 
   // Safety net: ads toggling a class, or a player rebuild we did not observe.
   window.setInterval(apply, 1000);
 
   apply();
-  console.log(`${LOG_PREFIX} ready (P2). Try Shift+. / Shift+, or __ytSpeedMaster.setRate(3)`);
+  console.log(`${LOG_PREFIX} ready (P3). Try Shift+. / Shift+, or __ytSpeedMaster.setRate(3)`);
 })();

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>YouTube Speed Master — popup harness</title>
+    <style>
+      body { margin: 0; background: #222; display: flex; justify-content: center; padding: 24px; }
+    </style>
+  </head>
+  <body>
+    <div id="frame"></div>
+    <script>
+      // Loads the real src/popup.html with a chrome.storage.sync stub injected before popup.js.
+      (async () => {
+        const stub = `
+          <script>
+            (() => {
+              const store = { defaultRate: 1.5, preservesPitch: true };
+              const listeners = [];
+              window.__store = store;
+              window.__emitStorageChange = (patch) => {
+                const changes = {};
+                for (const [key, value] of Object.entries(patch)) {
+                  changes[key] = { oldValue: store[key], newValue: value };
+                  store[key] = value;
+                }
+                for (const listener of listeners) listener(changes, 'sync');
+              };
+              window.chrome = {
+                runtime: { lastError: undefined },
+                storage: {
+                  sync: {
+                    get(defaults, callback) {
+                      setTimeout(() => callback({ ...defaults, ...store }), 10);
+                    },
+                    set(patch, callback) {
+                      setTimeout(() => { Object.assign(store, patch); if (callback) callback(); }, 5);
+                    }
+                  },
+                  onChanged: { addListener(listener) { listeners.push(listener); } }
+                }
+              };
+            })();
+          <\/script>
+        `;
+
+        let html = await (await fetch('/src/popup.html')).text();
+        const bust = '?t=' + Date.now();
+        html = html
+          .replace('href="popup.css"', 'href="/src/popup.css' + bust + '"')
+          .replace('src="../icons/icon48.png"', 'src="/icons/icon48.png"')
+          .replace('<script src="popup.js"><\/script>', stub + '<script src="/src/popup.js' + bust + '"><\/script>');
+
+        document.open();
+        document.write(html);
+        document.close();
+      })();
+    </script>
+  </body>
+</html>
