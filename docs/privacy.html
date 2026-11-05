@@ -43,7 +43,7 @@
   <body>
     <main>
       <h1>Privacy Policy — Speed Master</h1>
-      <p class="updated">Last updated: 5 November 2026</p>
+      <p class="updated">Last updated: 6 November 2026</p>
 
       <p>
         Speed Master does not collect, transmit, sell or share any user data.
@@ -51,10 +51,12 @@
 
       <h2>What is stored</h2>
       <p>
-        Only your extension preferences (preferred playback speed and whether pitch is preserved)
-        are stored, using <code>chrome.storage.sync</code>. That data stays inside your Chrome
-        profile and, if you are signed in to Chrome, syncs through Google's own sync service. The
-        extension has no servers and makes no network requests of its own.
+        Only your extension preferences are stored: preferred playback speed, pitch setting and
+        custom presets in <code>chrome.storage.sync</code>, plus the per-channel speeds you choose
+        to remember in <code>chrome.storage.local</code>. Synced data stays inside your Chrome
+        profile and, if you are signed in to Chrome, syncs through Google's own sync service.
+        Channel memory never leaves the device. The extension has no servers and makes no network
+        requests of its own.
       </p>
 
       <h2>What is not collected</h2>
@@ -69,7 +71,9 @@
       <h2>Permissions</h2>
       <ul>
         <li>
-          <code>storage</code> — saves your preferred playback speed and pitch preference locally.
+          <code>storage</code> — saves your playback speed, pitch preference, custom presets and
+          any per-channel speeds you choose to remember. Syncable settings use
+          <code>chrome.storage.sync</code>; channel memory stays in <code>chrome.storage.local</code>.
         </li>
         <li>
           Content script on <code>youtube.com</code> — sets the HTML5 <code>&lt;video&gt;</code>

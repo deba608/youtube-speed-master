@@ -1,15 +1,20 @@
 # Privacy Policy — Speed Master
 
-**Last updated:** 2026-11-05
+**Last updated:** 2026-11-06
 
 Speed Master does not collect, transmit, sell or share any user data.
 
 ## What is stored
 
-Only your extension preferences (for example, your preferred playback speed) are stored,
-using `chrome.storage.sync`. That data stays inside your Chrome profile and, if you are signed
-in to Chrome, syncs through Google's own sync service. The extension has no servers and no
-network requests of its own.
+Only your extension preferences are stored:
+
+- `chrome.storage.sync` — preferred playback speed, pitch setting and custom preset speeds. This
+  stays inside your Chrome profile and, if you are signed in to Chrome, syncs through Google's own
+  sync service.
+- `chrome.storage.local` — per-channel speeds you explicitly choose to remember. This stays on the
+  device and is never synced or transmitted.
+
+The extension has no servers and makes no network requests of its own.
 
 ## What is not collected
 

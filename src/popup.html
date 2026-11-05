@@ -43,10 +43,45 @@
         <input id="pitch" type="checkbox" checked />
       </label>
 
-      <p class="note">
-        In the player: click the speed pill, or press <kbd>Shift</kbd> + <kbd>.</kbd> /
-        <kbd>Shift</kbd> + <kbd>,</kbd>
-      </p>
+      <section class="section">
+        <div class="section-head">
+          <h2>Presets</h2>
+          <button id="preset-defaults" class="link" type="button">Defaults</button>
+        </div>
+        <div id="preset-editor" class="preset-editor" aria-label="Saved presets"></div>
+        <form id="preset-form" class="preset-add">
+          <input
+            id="preset-input"
+            type="number"
+            min="0.25"
+            max="4"
+            step="0.05"
+            placeholder="Add 1.15"
+            aria-label="New preset speed"
+          />
+          <button type="submit">Add</button>
+        </form>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <h2>Remembered channels</h2>
+          <button id="channels-clear" class="link" type="button">Clear all</button>
+        </div>
+        <div id="channel-list" class="channel-list"></div>
+        <p id="channel-empty" class="empty">
+          None. Use “Remember this channel” in the player panel.
+        </p>
+      </section>
+
+      <section class="section actions">
+        <button id="export-settings" type="button">Export</button>
+        <button id="import-settings" type="button">Import</button>
+        <button id="reset-all" type="button" class="danger">Reset all</button>
+        <input id="import-file" type="file" accept="application/json,.json" hidden />
+      </section>
+
+      <p id="status" class="status" role="status" hidden></p>
     </main>
 
     <script src="popup.js"></script>

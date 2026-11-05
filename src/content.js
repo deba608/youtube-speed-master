@@ -217,6 +217,7 @@
       return;
     }
     if (!hasSyncStorage) return;
+    state.defaultRate = state.desired;
     clearTimeout(persistTimer);
     persistTimer = window.setTimeout(() => {
       writeSync({ defaultRate: state.desired, preservesPitch: state.preservesPitch });
@@ -563,6 +564,12 @@
           ? 'This channel uses its own saved speed'
           : 'Save the current speed for this channel';
       }
+
+      // Small read-only mirror for manual inspection and the QA harness.
+      root.dataset.channel = info.channel || '';
+      root.dataset.remembered = String(info.remembered);
+      root.dataset.presets = info.presets.join(',');
+      root.dataset.extensionId = api.extensionId || '';
     };
 
     const setOpen = (next) => {
@@ -654,42 +661,96 @@
       if (root.parentElement !== player) player.appendChild(root);
     };
     ensureMounted();
-    document.addEventListener('yt-navigate-finish', ensureMounted);
-    window.setInterval(ensureMounted, 1000);
+    document.addEventListener('yt-navigate-finish', () => {
+      refreshChannel();
+      ensureMounted();
+    });
+    window.setInterval(() => {
+      ensureMounted();
+      refreshChannel();
+    }, 1000);
 
     return { root, setOpen };
   }
 
-  // --- Settings (chrome.storage.sync) ------------------------------------------
+  // --- Settings (chrome.storage) -----------------------------------------------
 
   const loadSettings = () => {
-    if (!hasSyncStorage) return;
-    chrome.storage.sync.get({ defaultRate: 1, preservesPitch: true }, (items) => {
-      if (chrome.runtime.lastError) {
-        console.warn(`${LOG_PREFIX} could not load settings`, chrome.runtime.lastError.message);
-        return;
-      }
+    const applySettings = (items, channels) => {
       suppressPersist = true;
       try {
-        api.setRate(items.defaultRate);
-        api.setPitch(Boolean(items.preservesPitch));
+        state.defaultRate = clampRate(items.defaultRate ?? 1);
+        state.presets = sanitizePresets(items.presets);
+        state.preservesPitch = items.preservesPitch !== false;
+        state.channelRates = sanitizeChannels(channels);
+        state.desired = state.defaultRate;
       } finally {
         suppressPersist = false;
       }
-    });
+      refreshChannel({ force: true });
+    };
+
+    if (!hasSyncStorage) {
+      applySettings({}, {});
+      return;
+    }
+
+    chrome.storage.sync.get(
+      { defaultRate: 1, preservesPitch: true, presets: DEFAULT_PRESETS },
+      (items) => {
+        if (chrome.runtime.lastError) {
+          console.warn(`${LOG_PREFIX} could not load settings`, chrome.runtime.lastError.message);
+          applySettings({}, {});
+          return;
+        }
+        if (!hasLocalStorage) {
+          applySettings(items, {});
+          return;
+        }
+        chrome.storage.local.get({ channelRates: {} }, (local) => {
+          if (chrome.runtime.lastError) {
+            console.warn(
+              `${LOG_PREFIX} could not load channel rates`,
+              chrome.runtime.lastError.message
+            );
+            applySettings(items, {});
+            return;
+          }
+          applySettings(items, local.channelRates);
+        });
+      }
+    );
   };
 
   const watchSettings = () => {
     if (!hasSyncStorage) return;
     chrome.storage.onChanged.addListener((changes, area) => {
-      if (area !== 'sync') return;
       suppressPersist = true;
       try {
-        if (changes.defaultRate) api.setRate(changes.defaultRate.newValue);
-        if (changes.preservesPitch) api.setPitch(Boolean(changes.preservesPitch.newValue));
+        if (area === 'sync') {
+          if (changes.defaultRate) {
+            state.defaultRate = clampRate(changes.defaultRate.newValue ?? 1);
+            // A remembered channel keeps its own rate.
+            if (!isRemembered()) state.desired = state.defaultRate;
+          }
+          if (changes.preservesPitch) {
+            state.preservesPitch = changes.preservesPitch.newValue !== false;
+          }
+          if (changes.presets) {
+            state.presets = sanitizePresets(changes.presets.newValue);
+          }
+        } else if (area === 'local' && changes.channelRates) {
+          state.channelRates = sanitizeChannels(changes.channelRates.newValue);
+          const entry = state.channelKey ? state.channelRates[state.channelKey] : null;
+          state.desired = entry ? clampRate(entry.rate) : clampRate(state.defaultRate);
+        } else {
+          return;
+        }
       } finally {
         suppressPersist = false;
       }
+      notify();
+      apply();
     });
   };
 

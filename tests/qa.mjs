@@ -225,6 +225,174 @@ try {
   await bridge(tab2, 'reset');
   check('final reset returns 1x', (await waitForRate(tab2, 1, 2000)) === true, await readRate(tab2));
 
+  // --- 1.1: ad overlay detection ----------------------------------------------
+  await tab1.waitForTimeout(700); // let any in-flight storage sync settle
+  await bridge(tab1, '2.4');
+  await waitForRate(tab1, 2.4, 1500);
+  await tab1.waitForTimeout(500);
+  await tab1.evaluate(() => {
+    const overlay = document.createElement('div');
+    overlay.className = 'ytp-ad-player-overlay';
+    overlay.id = 'qa-ad-overlay';
+    document.getElementById('movie_player').appendChild(overlay);
+  });
+  check('overlay-only ad keeps 1x', (await waitForRate(tab1, 1, 2500)) === true, await readRate(tab1));
+  await tab1.evaluate(() => document.getElementById('qa-ad-overlay')?.remove());
+  check('speed returns after overlay ad', (await waitForRate(tab1, 2.4, 2500)) === true, await readRate(tab1));
+
+  // --- 1.1: per-channel memory -------------------------------------------------
+  const extensionId = await tab1.getAttribute('#ytsm-root', 'data-extension-id');
+  check(
+    'extension id available for popup tests',
+    typeof extensionId === 'string' && extensionId.length > 10,
+    extensionId
+  );
+
+  check(
+    'channel detected on watch page',
+    (await tab1.getAttribute('#ytsm-root', 'data-channel')) === '/@qa-channel'
+  );
+
+  await tab1.click('#ytsm-root .ytsm-toggle');
+  await tab1.waitForTimeout(200);
+  check(
+    'remember row visible on a channel page',
+    await tab1.evaluate(() => !document.querySelector('#ytsm-root .ytsm-remember').hidden)
+  );
+  await tab1.click('#ytsm-root .ytsm-remember input');
+  await tab1.waitForTimeout(500);
+  check(
+    'remember channel saves the current rate',
+    (await tab1.getAttribute('#ytsm-root', 'data-remembered')) === 'true'
+  );
+  await tab1.keyboard.press('Escape');
+
+  // --- 1.1: popup (presets, channels, export/import/reset) ---------------------
+  const popup = await context.newPage();
+  const popupErrors = [];
+  popup.on('pageerror', (error) => popupErrors.push(String(error)));
+  await popup.goto(`chrome-extension://${extensionId}/src/popup.html`, { waitUntil: 'load' });
+  await popup.waitForSelector('#presets .preset', { timeout: 8000 });
+  check('popup loads without errors', popupErrors.length === 0, popupErrors);
+  check(
+    'popup shows the 11 default presets',
+    (await popup.$$('#presets .preset')).length === 11
+  );
+  check(
+    'popup lists the remembered channel',
+    (await popup.$$('.channel-row')).length === 1 &&
+      (await popup.textContent('.channel-rate')) === '2.40x'
+  );
+
+  // Changing the global default must not override a remembered channel.
+  await popup.evaluate(() => {
+    const speed = document.getElementById('speed');
+    speed.value = '1';
+    speed.dispatchEvent(new Event('input', { bubbles: true }));
+    speed.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await popup.waitForTimeout(500);
+  check(
+    'global default change leaves the remembered channel alone',
+    (await tab1.textContent('#ytsm-root .ytsm-toggle')) === '2.40x'
+  );
+
+  await tab1.evaluate(() => window.__fixture.setChannel('@qa-other'));
+  await tab1.waitForTimeout(400);
+  check(
+    'other channel falls back to global default',
+    (await waitForRate(tab1, 1, 2500)) === true,
+    await readRate(tab1)
+  );
+
+  await tab1.evaluate(() => window.__fixture.setChannel('@qa-channel'));
+  await tab1.waitForTimeout(400);
+  check(
+    'remembered channel restores 2.4x',
+    (await waitForRate(tab1, 2.4, 2500)) === true,
+    await readRate(tab1)
+  );
+
+  await popup.click('.channel-remove');
+  await popup.waitForTimeout(500);
+  check(
+    'popup forgets a channel',
+    (await tab1.getAttribute('#ytsm-root', 'data-remembered')) === 'false'
+  );
+  check(
+    'rate falls back after forgetting',
+    (await waitForRate(tab1, 1, 2500)) === true,
+    await readRate(tab1)
+  );
+
+  await popup.fill('#preset-input', '1.15');
+  await popup.click('#preset-form button[type="submit"]');
+  await popup.waitForTimeout(500);
+  check(
+    'custom preset reaches the player panel',
+    (await tab1.$$('#ytsm-root .ytsm-preset')).length === 12 &&
+      (await tab1.getAttribute('#ytsm-root', 'data-presets')).includes('1.15')
+  );
+
+  await popup.click('#preset-defaults');
+  await popup.waitForTimeout(500);
+  check(
+    'presets restore to defaults',
+    (await tab1.$$('#ytsm-root .ytsm-preset')).length === 11
+  );
+
+  const downloadPromise = popup.waitForEvent('download', { timeout: 5000 }).catch(() => null);
+  await popup.click('#export-settings');
+  const download = await downloadPromise;
+  let exported = null;
+  if (download) {
+    try {
+      exported = JSON.parse(readFileSync(await download.path(), 'utf8'));
+    } catch (error) {
+      exported = null;
+    }
+  }
+  check(
+    'export downloads a settings JSON',
+    exported?.app === 'speed-master' &&
+      exported?.schema === 1 &&
+      Array.isArray(exported?.settings?.presets)
+  );
+
+  const importPayload = {
+    app: 'speed-master',
+    schema: 1,
+    settings: { defaultRate: 3.3, preservesPitch: false, presets: [1, 1.5, 2, 3, 4] },
+    channels: {},
+  };
+  await popup.setInputFiles('#import-file', {
+    name: 'settings.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(importPayload)),
+  });
+  await popup.waitForTimeout(700);
+  check(
+    'import applies the default speed',
+    (await waitForRate(tab1, 3.3, 3000)) === true,
+    await readRate(tab1)
+  );
+  check(
+    'import applies presets and pitch',
+    (await tab1.$$('#ytsm-root .ytsm-preset')).length === 5 &&
+      (await tab1.evaluate(() => document.querySelector('video').preservesPitch)) === false
+  );
+
+  await popup.click('#reset-all');
+  await popup.waitForTimeout(700);
+  check(
+    'reset all returns to 1x with pitch on',
+    (await waitForRate(tab1, 1, 3000)) === true &&
+      (await tab1.evaluate(() => document.querySelector('video').preservesPitch)) === true,
+    await readRate(tab1)
+  );
+
+  await popup.close();
+
   // --- optional: real youtube.com smoke ---------------------------------------
   if (process.env.QA_REAL === '1') {
     const realProfile = mkdtempSync(path.join(tmpdir(), 'ytsm-real-'));

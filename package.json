@@ -1,6 +1,6 @@
 {
   "name": "youtube-speed-master",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Chrome extension (Manifest V3) that unlocks YouTube playback speed beyond the built-in 2x cap.",
   "type": "module",

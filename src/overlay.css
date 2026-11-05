@@ -245,6 +245,37 @@
   font-weight: 700;
 }
 
+#ytsm-root .ytsm-remember {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--ytsm-muted);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+#ytsm-root .ytsm-remember[hidden] {
+  display: none;
+}
+
+#ytsm-root .ytsm-remember input {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  accent-color: var(--ytsm-accent);
+  cursor: pointer;
+}
+
+#ytsm-root .ytsm-remember-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* --- footer --- */
 
 #ytsm-root .ytsm-foot {

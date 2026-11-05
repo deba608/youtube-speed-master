@@ -244,6 +244,257 @@ output {
   cursor: pointer;
 }
 
+/* --- sections --- */
+
+.section {
+  margin-top: 12px;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.section-head h2 {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.link {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.link:hover,
+.link:focus-visible {
+  color: var(--accent-strong);
+  outline: none;
+}
+
+.link:disabled {
+  color: var(--muted);
+  opacity: 0.45;
+  cursor: default;
+}
+
+.preset-editor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 76px;
+  padding-right: 2px;
+  overflow-y: auto;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 4px 3px 7px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.chip-remove {
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.chip-remove:hover,
+.chip-remove:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--fg);
+  outline: none;
+}
+
+.chip-remove:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.preset-add {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.preset-add input {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--fg);
+  font: inherit;
+  font-size: 11px;
+}
+
+.preset-add input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.preset-add button {
+  padding: 5px 10px;
+  border: 1px solid rgba(45, 212, 191, 0.4);
+  border-radius: 6px;
+  background: rgba(45, 212, 191, 0.12);
+  color: var(--accent-strong);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.preset-add button:hover,
+.preset-add button:focus-visible {
+  background: rgba(45, 212, 191, 0.2);
+  outline: none;
+}
+
+.channel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 96px;
+  overflow-y: auto;
+}
+
+.channel-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+.channel-text {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+.channel-name {
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.channel-rate {
+  color: var(--accent-strong);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.channel-remove {
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.channel-remove:hover,
+.channel-remove:focus-visible {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--fg);
+  outline: none;
+}
+
+.empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.empty[hidden] {
+  display: none;
+}
+
+.actions {
+  display: flex;
+  gap: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.actions button {
+  flex: 1;
+  padding: 6px 4px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.actions button:hover,
+.actions button:focus-visible {
+  border-color: rgba(45, 212, 191, 0.5);
+  outline: none;
+}
+
+.actions .danger {
+  color: #fca5a5;
+}
+
+.actions .danger:hover,
+.actions .danger:focus-visible {
+  border-color: rgba(248, 113, 113, 0.6);
+  background: rgba(248, 113, 113, 0.08);
+}
+
+.status {
+  margin: 8px 0 0;
+  color: var(--accent-strong);
+  font-size: 10px;
+  text-align: center;
+}
+
+.status[hidden] {
+  display: none;
+}
+
+.status.is-error {
+  color: #fca5a5;
+}
+
 /* --- footer --- */
 
 .note {

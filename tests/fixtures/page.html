@@ -14,12 +14,21 @@
     <div id="movie_player" class="html5-video-player">
       <video class="html5-main-video" playsinline></video>
     </div>
+    <div id="owner">
+      <a id="owner-link" href="/@qa-channel"><span id="owner-name">QA Channel</span></a>
+    </div>
     <p class="note">Local YouTube-shaped fixture for QA. No media is loaded.</p>
 
     <script>
       window.__fixture = {
         setRate(rate) {
           document.querySelector('video').playbackRate = rate;
+        },
+        setChannel(handle) {
+          const link = document.getElementById('owner-link');
+          link.setAttribute('href', '/' + handle.replace(/^\/+/, ''));
+          document.getElementById('owner-name').textContent = 'QA ' + handle.replace(/^\W+/, '');
+          document.dispatchEvent(new Event('yt-navigate-finish'));
         },
         addAd() {
           document.getElementById('movie_player').classList.add('ad-showing');

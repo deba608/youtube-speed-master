@@ -1,6 +1,6 @@
 # Chrome Web Store listing — Speed Master
 
-Store copy and metadata for Speed Master v1.0.0.
+Store copy and metadata for Speed Master v1.1.0.
 
 Dashboard walkthrough: [PUBLISH.md](PUBLISH.md).
 
@@ -9,7 +9,7 @@ Dashboard walkthrough: [PUBLISH.md](PUBLISH.md).
 ## Identity
 
 - **Name:** Speed Master
-- **Version:** 1.0.0
+- **Version:** 1.1.0
 - **Category:** Productivity
 - **Language:** English
 - **Visibility:** Public, all regions
@@ -44,6 +44,19 @@ SET IT ONCE
 • Saved with chrome.storage.sync, so it follows your Chrome profile and survives restarts
 • Per-page changes (slider, presets, hotkeys) also become the saved default
 
+PER-CHANNEL MEMORY
+• Tick "Remember this channel" in the player panel to give one channel its own speed
+• Lectures at 3x and music at 1.25x, while everything else keeps the global default
+• Manage or clear saved channels from the popup; stored locally, never transmitted
+
+YOUR PRESETS
+• Add or remove preset speeds (3–12 entries, 0.25x–4x)
+• One click restores the original eleven presets
+
+BACKUP AND RESTORE
+• Export speed, pitch, presets and channel memory to one JSON file
+• Import it back, or reset every setting from the popup
+
 KEEPS OUT OF THE WAY
 • Compact speed pill in the player; open the full panel only when you need it
 • Ads always play at 1x
@@ -60,6 +73,8 @@ store UI stays within 0.25x–4x.
 Not affiliated with YouTube or Google. YouTube is a trademark of Google LLC.
 
 CHANGELOG
+1.1.0 — per-channel speed memory, custom presets, export/import, reset all, overlay-ad detection,
+post-ad speed restore.
 1.0.0 — first release: overlay panel, slider, presets, hotkeys, popup defaults, sync storage,
 ads at 1x, pitch preservation.
 ```
@@ -91,7 +106,7 @@ No host permissions beyond `youtube.com`. No `tabs`, `history`, `scripting` or `
 
 | Asset | File | Status |
 |---|---|---|
-| Extension ZIP | `dist/youtube-speed-master-1.0.0.zip` | built by `npm run package` |
+| Extension ZIP | `dist/youtube-speed-master-1.1.0.zip` | built by `npm run package` |
 | Store icon 128x128 | `icons/icon128.png` | done |
 | Screenshot 1 (1280x800) | `store/screenshot-1.png` | panel open at 2.5x |
 | Screenshot 2 (1280x800) | `store/screenshot-2.png` | popup settings |
@@ -103,7 +118,6 @@ Screenshot captions (optional in the dashboard):
 1. Watch up to 4x — slider, presets and a live speed readout
 2. Set your default once — synced through Chrome
 3. Keyboard-first — Shift + . / Shift + , to step speed
-
 ## Review notes to pre-empt rejection
 
 - Purpose is narrow and stated in the first line of the description.

@@ -29,8 +29,8 @@ optional reading.
 Two ZIPs work; both must be extracted first — Chrome cannot load a `.zip`.
 
 - **Packaged build** (recommended, only runtime files):
-  [`youtube-speed-master-1.0.0.zip`](https://github.com/deba608/youtube-speed-master/releases/latest/download/youtube-speed-master-1.0.0.zip)
-  — or run `npm run package` in a clone to produce `dist/youtube-speed-master-1.0.0.zip`
+  [`youtube-speed-master-1.1.0.zip`](https://github.com/deba608/youtube-speed-master/releases/latest/download/youtube-speed-master-1.1.0.zip)
+  — or run `npm run package` in a clone to produce `dist/youtube-speed-master-1.1.0.zip`
 - **Repository source**: GitHub → **Code** → **Download ZIP**
 
 1. Extract the ZIP to a permanent folder, e.g. `C:\Users\Dev\Speed-Master`.
@@ -87,6 +87,7 @@ If the pill does not appear, see [Troubleshooting](#troubleshooting).
 | Slower by 0.25x | <kbd>Shift</kbd> + <kbd>,</kbd> |
 | Close the panel | <kbd>Esc</kbd>, or click outside it |
 | Natural or chipmunk audio | **Keep pitch** checkbox in the panel |
+| Remember a channel's speed | **Remember &lt;channel&gt;** checkbox in the panel |
 
 Hotkeys are ignored while you type in a comment box, search field or the address bar, so they will
 not interrupt text entry.
@@ -98,9 +99,20 @@ Click the Speed Master icon to set the **default speed for every video**:
 - Slider + presets, same 0.25x–4x range.
 - **Reset 1x** returns to normal speed.
 - **Keep pitch** sets the audio preference globally.
+- **Presets** — add a speed, remove one (minimum three), or restore defaults.
+- **Remembered channels** — every channel saved from the player, with per-row remove and
+  **Clear all**.
+- **Export / Import / Reset all** — JSON backup of speed, pitch, presets and channel memory.
 
 Changes apply immediately to open YouTube tabs and are remembered across restarts. If you are
 signed in to Chrome, they also sync to your other computers through your Chrome profile.
+
+### Per-channel memory
+
+Tick **Remember &lt;channel&gt;** in the player panel to give one channel its own speed. That rate
+then wins over the global default whenever you watch the channel, and the popup lists it for
+removal. Channels without an entry keep using the global default. Feature is off until you tick a
+channel, and the entries are stored locally (not synced).
 
 ### Ads and fullscreen
 
@@ -132,21 +144,26 @@ The limit resets to the UI range the next time you use the slider or popup.
 
 ## Settings and sync
 
-Only two values are stored, both in `chrome.storage.sync`:
+Only these values are stored:
 
-| Key | Meaning |
-|---|---|
-| `defaultRate` | Speed applied to new videos (0.25–4) |
-| `preservesPitch` | Keep audio natural (`true`) or let it rise (`false`) |
+| Key | Area | Meaning |
+|---|---|---|
+| `defaultRate` | `chrome.storage.sync` | Speed applied to new videos (0.25–4) |
+| `preservesPitch` | `chrome.storage.sync` | Keep audio natural (`true`) or let it rise (`false`) |
+| `presets` | `chrome.storage.sync` | Custom preset list (3–12 speeds) |
+| `channelRates` | `chrome.storage.local` | Per-channel speeds and names |
 
-Nothing leaves your browser except Chrome's own profile sync, if you have it enabled. See
-[PRIVACY.md](PRIVACY.md).
+Nothing leaves your browser except Chrome's own profile sync, if you have it enabled. Channel
+memory stays on this device. See [PRIVACY.md](PRIVACY.md).
 
-### Reset everything
+### Backup, restore and reset
 
-1. Click the toolbar icon → **Reset 1x**.
-2. To wipe the stored settings completely: `chrome://extensions` → Speed Master → **Remove**, then
-   reinstall. Removing the extension clears its storage.
+- **Export** in the popup writes `speed-master-settings.json` with your speed, pitch, presets and
+  channel memory.
+- **Import** reads that file back; invalid files are rejected without changing anything.
+- **Reset all** clears every setting and channel entry.
+
+To remove everything including storage, uninstall the extension.
 
 ---
 
@@ -159,6 +176,7 @@ Nothing leaves your browser except Chrome's own profile sync, if you have it ena
 | Hotkeys do nothing | Click once inside the page first. Hotkeys are disabled while a text field has focus. |
 | Speed is ignored on ads | Expected — ads are forced to 1x on purpose. |
 | Audio sounds sped up | Enable **Keep pitch** in the panel or the popup. |
+| A channel ignores the default speed | It has a remembered rate. Open the popup → **Remembered channels** → remove it. |
 | Panel is hidden behind player controls | Hover the player so the controls fade, or use fullscreen. |
 | Settings did not carry to another computer | Chrome sync must be on for the profile; check `chrome://settings/syncSetup`. |
 | `[Speed Master] ready` not in console | The extension is disabled or not loaded. Check `chrome://extensions` for errors. |

@@ -34,7 +34,9 @@ requested shapes of feedback for speed extensions, and neither adds a permission
 
 ---
 
-## 1.1.0 — Memory (target: next minor release)
+## 1.1.0 — Memory (shipped 2026-11-06)
+
+All four items below are implemented, covered by the automated QA suite and shipped in v1.1.0.
 
 ### 1.1 Per-channel speed memory
 

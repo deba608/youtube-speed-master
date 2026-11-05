@@ -13,7 +13,7 @@
 <p align="center">
   <a href="https://github.com/deba608/youtube-speed-master/releases"><img src="https://img.shields.io/github/v/release/deba608/youtube-speed-master?label=release&color=2dd4bf" alt="Release" /></a>
   <a href="manifest.json"><img src="https://img.shields.io/badge/manifest-v3-2dd4bf" alt="Manifest V3" /></a>
-  <a href="tests/qa.mjs"><img src="https://img.shields.io/badge/QA-23%2F23-2dd4bf" alt="QA: 23/23" /></a>
+  <a href="tests/qa.mjs"><img src="https://img.shields.io/badge/QA-43%2F43-2dd4bf" alt="QA: 43/43" /></a>
   <a href="PRIVACY.md"><img src="https://img.shields.io/badge/tracking-none-2dd4bf" alt="No tracking" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/deba608/youtube-speed-master?color=2dd4bf" alt="License: MIT" /></a>
 </p>
@@ -38,6 +38,11 @@
 - **Keyboard-first** — `Shift + .` speeds up by 0.25x, `Shift + ,` slows down by 0.25x.
 - **In-player panel** — a compact speed pill opens a full panel; `Esc` or a click outside closes it.
 - **Set it once** — choose a default speed in the toolbar popup; changes apply live to open tabs.
+- **Per-channel memory** — opt in to “Remember this channel” and lectures keep 2.5x while music
+  stays at 1.25x. Managed from the popup.
+- **Your presets** — add or remove preset speeds (3–12, 0.25x–4x); one click restores defaults.
+- **Backup and restore** — export speed, pitch, presets and channel memory to JSON, import it back,
+  or reset everything.
 - **Pitch stays natural** — pitch preservation is on by default and toggleable in the panel or popup.
 - **Ads stay at 1x** — the panel shows an `Ad · 1x` badge, then your speed returns after the ad.
 - **Sticks to the video** — re-applies after SPA navigation, player rebuilds, `loadedmetadata` and
@@ -45,7 +50,7 @@
 - **Private by design** — no account, analytics, telemetry, remote code or network requests of its
   own.
 
-**Status:** v1.0.0 is packaged and available on GitHub. Chrome Web Store submission is the last
+**Status:** v1.1.0 is packaged and available on GitHub. Chrome Web Store submission is the last
 remaining step; see [store/PUBLISH.md](store/PUBLISH.md). What comes next is in [ROADMAP.md](ROADMAP.md).
 
 New here? [GUIDE.md](GUIDE.md) covers install, controls, settings and troubleshooting in detail.
@@ -54,13 +59,13 @@ New here? [GUIDE.md](GUIDE.md) covers install, controls, settings and troublesho
 
 ### Chrome Web Store
 
-Not live yet — v1.0.0 is ready and awaiting the final dashboard submission. The listing link will be
+Not live yet — v1.1.0 is ready and awaiting the final dashboard submission. The listing link will be
 added here once approved; the walkthrough is in [store/PUBLISH.md](store/PUBLISH.md).
 
 ### From the release ZIP (recommended for now)
 
 1. Download
-   [`youtube-speed-master-1.0.0.zip`](https://github.com/deba608/youtube-speed-master/releases/latest/download/youtube-speed-master-1.0.0.zip)
+   [`youtube-speed-master-1.1.0.zip`](https://github.com/deba608/youtube-speed-master/releases/latest/download/youtube-speed-master-1.1.0.zip)
    and extract it. Chrome cannot load a `.zip` directly.
 2. Open `chrome://extensions` and enable **Developer mode**.
 3. Click **Load unpacked** and select the extracted folder that **directly contains
@@ -99,19 +104,23 @@ Step-by-step instructions for Chrome, the ZIP, Edge and Brave:
 | Close the panel | `Esc`, or click outside it |
 | Natural or sped-up audio | **Keep pitch** in the panel or popup |
 | Set the default for every video | Toolbar icon → slider, presets, **Reset 1x** |
+| Remember a channel's speed | Open the panel on a video → **Remember this channel** |
 
 Hotkeys are ignored while you type in a comment box, search field or the address bar. Changes made
 from the panel, presets or hotkeys also become the saved default.
 
-Only two values are stored, both in `chrome.storage.sync`:
+Only these values are stored:
 
-| Key | Meaning |
-|---|---|
-| `defaultRate` | Speed applied to new videos (0.25–4 from the UI) |
-| `preservesPitch` | Keep audio natural (`true`) or let it rise (`false`) |
+| Key | Area | Meaning |
+|---|---|---|
+| `defaultRate` | `sync` | Speed applied to new videos (0.25–4 from the UI) |
+| `preservesPitch` | `sync` | Keep audio natural (`true`) or let it rise (`false`) |
+| `presets` | `sync` | Custom preset list (3–12 rates) |
+| `channelRates` | `local` | Per-channel speeds plus channel names |
 
-If Chrome sync is enabled, these follow your Chrome profile to other computers. The extension has
-no servers of its own.
+If Chrome sync is enabled, the `sync` keys follow your Chrome profile to other computers. Channel
+memory stays on this device. The extension has no servers of its own. Export everything from the
+popup as JSON.
 
 ### Speed limits
 
@@ -132,8 +141,11 @@ __ytSpeedMaster.setRate(3);        // 3x (clamped to 0.0625–16)
 __ytSpeedMaster.getRate();         // 3
 __ytSpeedMaster.setPitch(false);   // let the audio rise with speed
 __ytSpeedMaster.enable(false);     // pause the rate engine
-__ytSpeedMaster.info();            // { desired, applied, enabled, preservesPitch, ad, hasVideo }
+__ytSpeedMaster.info();            // { desired, applied, defaultRate, channel, remembered, presets, ... }
 __ytSpeedMaster.reset();           // back to 1x
+__ytSpeedMaster.setPresets([1, 1.5, 2, 2.5, 3]);
+__ytSpeedMaster.remember(true);    // save the current rate for this channel
+__ytSpeedMaster.refreshChannel();  // re-read the owner link and apply its rate
 ```
 
 From the page context, use the primitive-only bridge:
@@ -170,7 +182,7 @@ The extension is MV3, requests only the `storage` permission, and runs a content
 | Command | What it does |
 |---|---|
 | `npm run check` | Syntax-check `src/content.js` and `src/popup.js` |
-| `npm run qa` | Run the 23-check Playwright suite |
+| `npm run qa` | Run the 43-check Playwright suite |
 | `$env:QA_REAL='1'; npm run qa` | Add the real-YouTube smoke test (3 extra checks; can be flaky) |
 | `npm run package` | Build `dist/youtube-speed-master-<version>.zip` |
 | `npm run assets` | Re-render store screenshots and the promo tile |
@@ -187,7 +199,7 @@ repository root with any static server, then open the harness paths.
 ```powershell
 npm install
 npx playwright install chromium   # once
-npm run qa                        # 23 automated checks
+npm run qa                        # 43 automated checks
 $env:QA_REAL = '1'; npm run qa    # + real youtube.com smoke test
 ```
 
@@ -203,7 +215,7 @@ Manual cases that need a human on real YouTube (live, Shorts, playlist, incognit
 ## Packaging & store assets
 
 ```powershell
-npm run package   # writes dist/youtube-speed-master-1.0.0.zip
+npm run package   # writes dist/youtube-speed-master-1.1.0.zip
 ```
 
 The ZIP contains `manifest.json`, `src/` and `icons/` only — manifest at the root, no dev files. The
