@@ -20,7 +20,7 @@ Effort is rough (S < 1 day, M 1–3 days, L 1–2 weeks).
 | 2 | 1.1.0 | Custom preset editor | High | M | Low |
 | 3 | 1.1.0 | Ad hand-off hardening | Medium | S | Low |
 | 4 | 1.1.0 | Reset all + settings export | Medium | S | Low |
-| 5 | 1.2.0 | Options page (advanced settings) | High | M | Low |
+| 5 | 1.2.0 | Options page + panel appearance (size, transparency, position) | High | M | Low |
 | 6 | 1.2.0 | Accessibility pass | Medium | M | Low |
 | 7 | 1.2.0 | Shorts / Music / live-stream polish | High | M | Medium |
 | 8 | 1.2.0 | Extended hotkeys | Medium | S | Low |
@@ -29,8 +29,8 @@ Effort is rough (S < 1 day, M 1–3 days, L 1–2 weeks).
 | 11 | 2.0.0 | Speed profiles / rules | Medium | L | Medium |
 | 12 | infra | CI + automated store package | High | S | Low |
 
-Recommendation: ship **1.1.0** next — per-channel memory and editable presets are the two most
-requested shapes of feedback for speed extensions, and neither adds a permission.
+Recommendation: **1.2.0 shipped** with appearance controls, an options page and configurable hotkeys.
+The next release is **1.3.0** — localization and the Firefox/Edge ports.
 
 ---
 
@@ -111,34 +111,34 @@ restore the wrong rate.
 
 ---
 
-## 1.2.0 — Control (target: 4–6 weeks out)
+## 1.2.0 — Control (shipped 2026-11-06)
 
 ### 1.5 Options page
 
-`options_ui` in the manifest (new tab, not embedded), still no new permission:
+`options_ui` in the manifest (new tab, not embedded), still no new permission. Shipped with:
 
+- Panel appearance: size (80–140%), transparency (40–100%), left/right position, auto-hide.
+- Live preview of the panel styling.
 - Step size for hotkeys (0.05 / 0.1 / 0.25 / 0.5).
-- Enable/disable hotkeys; show the current bindings.
-- Channel memory manager (list, search, delete, clear).
-- Preset editor (moved from popup when the list grows).
-- Export/import, reset all.
-- Diagnostics: current rate, ad state, video found, storage usage — copy as text for issues.
+- Enable/disable hotkeys and a list of the current bindings.
+- **Reset appearance** and **Reset everything**.
+- Popup header ⚙ button opens the same page.
 
 ### 1.6 Accessibility pass
 
-- Focus trap in the panel, `Esc` returns focus to the pill.
-- Arrow/Page keys on the slider, `Home`/`End` for min/max.
-- `aria-live="polite"` announcement on speed change (“2.50x”).
-- Respect `prefers-reduced-motion`; AA contrast in both themes.
-- Target: full keyboard-only operation, no mouse.
+- `Esc` returns focus to the pill; the close button does too.
+- `aria-live="polite"` announcement on speed change (“Playback speed 2.50x”).
+- Native range semantics for the slider (arrow keys, `Home`/`End`).
+- Respects `prefers-reduced-motion`; labelled controls throughout.
 
-**Acceptance:** manual checklist in `tests/MANUAL-QA.md`, plus a Playwright keyboard-only test.
+**Acceptance:** covered in `tests/qa.mjs` (focus return, live region, keyboard-only speed changes).
 
 ### 1.7 Shorts, Music and live polish
 
-- Shorts: keep the pill clear of the right-hand action rail at all viewport heights.
-- `music.youtube.com`: verify routing and the same panel; add to the QA fixture map.
-- Live streams: ignore seeks; re-apply after DVR reconnects; never force a rate during buffering.
+- Shorts: the panel is raised on `/shorts/` pages so it clears the action rail.
+- `music.youtube.com`: inherits the same content-script match and panel.
+- Live streams: the 1-second safety net and `ratechange` guard re-apply after DVR reconnects;
+  no writes during buffering beyond the normal apply path.
 - Embedded `youtube.com/embed/…` stays out of scope (`all_frames: false`).
 
 ### 1.8 Extended hotkeys
@@ -147,7 +147,7 @@ restore the wrong rate.
 |---|---|
 | `Shift + .` / `Shift + ,` | ± one step (configurable size) |
 | `Shift + 0` | Reset to 1x |
-| `Shift + 1…4` | Jump to 1x / 1.5x / 2x / 3x |
+| `Shift + 1…4` | Jump to 1x / 2x / 3x / 4x |
 | `Esc` | Close panel, return focus |
 
 Typing in inputs, textareas, contenteditable and the search box stays ignored.

@@ -283,6 +283,19 @@ try {
     (await popup.$$('.channel-row')).length === 1 &&
       (await popup.textContent('.channel-rate')) === '2.40x'
   );
+  check('popup exposes the settings button', (await popup.$$('#open-options')).length === 1);
+
+  const optionsPagePromise = context
+    .waitForEvent('page', { timeout: 5000 })
+    .catch(() => null);
+  await popup.click('#open-options');
+  const openedOptions = await optionsPagePromise;
+  check(
+    'popup settings button opens the options page',
+    Boolean(openedOptions && openedOptions.url().includes('/src/options.html')),
+    openedOptions ? openedOptions.url() : 'no page'
+  );
+  if (openedOptions) await openedOptions.close();
 
   // Changing the global default must not override a remembered channel.
   await popup.evaluate(() => {
@@ -392,6 +405,145 @@ try {
   );
 
   await popup.close();
+
+  // --- 1.2: appearance + hotkey options ---------------------------------------
+  const options = await context.newPage();
+  const optionsErrors = [];
+  options.on('pageerror', (error) => optionsErrors.push(String(error)));
+  await options.goto(`chrome-extension://${extensionId}/src/options.html`, { waitUntil: 'load' });
+  await options.waitForSelector('#ui-scale', { timeout: 8000 });
+  check('options page loads without errors', optionsErrors.length === 0, optionsErrors);
+  check(
+    'options page shows appearance controls',
+    (await options.$$('#ui-scale, #ui-opacity, #ui-autohide')).length === 3 &&
+      (await options.$$('input[name="ui-position"]')).length === 2
+  );
+
+  const setRange = async (id, value) => {
+    await options.evaluate(
+      ({ id, value }) => {
+        const input = document.getElementById(id);
+        input.value = String(value);
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      },
+      { id, value }
+    );
+    await options.waitForTimeout(400);
+  };
+
+  await setRange('ui-scale', 1.3);
+  check(
+    'size setting reaches the player panel',
+    (await tab1.getAttribute('#ytsm-root', 'data-ui-scale')) === '1.30' &&
+      (await tab1.evaluate(() =>
+        document.querySelector('#ytsm-root').style.getPropertyValue('--ytsm-scale')
+      )) === '1.3'
+  );
+
+  await setRange('ui-opacity', 0.55);
+  check(
+    'transparency setting reaches the player panel',
+    (await tab1.getAttribute('#ytsm-root', 'data-ui-opacity')) === '0.55'
+  );
+
+  await options.check('input[name="ui-position"][value="left"]');
+  await options.waitForTimeout(400);
+  check(
+    'position setting moves the panel left',
+    (await tab1.getAttribute('#ytsm-root', 'data-position')) === 'left'
+  );
+
+  await options.check('#ui-autohide');
+  await options.waitForTimeout(400);
+  check(
+    'auto-hide setting reaches the player panel',
+    (await tab1.getAttribute('#ytsm-root', 'data-autohide')) === 'true'
+  );
+
+  await options.selectOption('#hotkey-step', '0.5');
+  await options.waitForTimeout(400);
+  await tab1.keyboard.press('Shift+.');
+  await tab1.waitForTimeout(200);
+  check(
+    'custom hotkey step changes playback speed',
+    (await waitForRate(tab1, 1.5, 1500)) === true,
+    await readRate(tab1)
+  );
+
+  await options.uncheck('#hotkeys-enabled');
+  await options.waitForTimeout(400);
+  await tab1.keyboard.press('Shift+.');
+  await tab1.waitForTimeout(200);
+  check(
+    'disabling hotkeys blocks the shortcuts',
+    (await readRate(tab1)) === 1.5,
+    await readRate(tab1)
+  );
+  check(
+    'panel hint reflects disabled hotkeys',
+    (await tab1.textContent('#ytsm-root .ytsm-hint')) === 'Hotkeys off'
+  );
+
+  await options.check('#hotkeys-enabled');
+  await options.waitForTimeout(400);
+  await options.click('#reset-appearance');
+  await options.waitForTimeout(500);
+  check(
+    'reset appearance restores size, position and opacity',
+    (await tab1.getAttribute('#ytsm-root', 'data-ui-scale')) === '1.00' &&
+      (await tab1.getAttribute('#ytsm-root', 'data-position')) === 'right' &&
+      (await tab1.getAttribute('#ytsm-root', 'data-autohide')) === 'false'
+  );
+
+  // --- 1.2: added hotkeys + accessibility -------------------------------------
+  await tab1.keyboard.press('Shift+0');
+  await tab1.waitForTimeout(200);
+  check(
+    'Shift+0 returns to 1x',
+    (await waitForRate(tab1, 1, 1500)) === true,
+    await readRate(tab1)
+  );
+
+  await tab1.keyboard.press('Shift+2');
+  await tab1.waitForTimeout(200);
+  check(
+    'Shift+2 jumps to 2x',
+    (await waitForRate(tab1, 2, 1500)) === true,
+    await readRate(tab1)
+  );
+  check(
+    'screen reader status announces the speed',
+    (await tab1.textContent('#ytsm-root .ytsm-sr')).includes('2.00x')
+  );
+
+  check(
+    'watch page is tagged for styling',
+    (await tab1.getAttribute('#ytsm-root', 'data-page')) === 'watch'
+  );
+
+  await tab1.click('#ytsm-root .ytsm-toggle');
+  await tab1.waitForTimeout(150);
+  await tab1.keyboard.press('Escape');
+  await tab1.waitForTimeout(150);
+  check(
+    'Escape returns focus to the pill',
+    await tab1.evaluate(() =>
+      document.activeElement?.classList.contains('ytsm-toggle')
+    )
+  );
+
+  const { page: shortsTab } = await openTab('/shorts/qa-short');
+  await shortsTab.waitForTimeout(300);
+  check(
+    'shorts page is tagged for placement',
+    (await shortsTab.getAttribute('#ytsm-root', 'data-page')) === 'shorts'
+  );
+
+  await options.click('#reset-all');
+  await options.waitForTimeout(600);
+  await options.close();
+  await shortsTab.close();
 
   // --- optional: real youtube.com smoke ---------------------------------------
   if (process.env.QA_REAL === '1') {

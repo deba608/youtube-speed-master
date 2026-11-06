@@ -71,7 +71,14 @@
     channelKey: null,
     channelName: '',
     channelRates: {},
-    ui: { ...UI_DEFAULTS },
+    ui: {
+      scale: UI_DEFAULTS.uiScale,
+      opacity: UI_DEFAULTS.uiOpacity,
+      position: UI_DEFAULTS.uiPosition,
+      autoHide: UI_DEFAULTS.uiAutoHide,
+      hotkeysEnabled: UI_DEFAULTS.hotkeysEnabled,
+      step: UI_DEFAULTS.hotkeyStep,
+    },
     quality: {
       mode: 'auto', // auto | max | fixed
       cap: 1080, // used when mode === 'fixed'

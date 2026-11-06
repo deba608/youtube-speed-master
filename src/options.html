@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Speed Master settings</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="head">
+        <img class="logo" src="../icons/icon48.png" width="34" height="34" alt="" />
+        <div>
+          <h1>Speed Master settings</h1>
+          <p class="muted">Appearance and keyboard shortcuts</p>
+        </div>
+        <span class="saved" id="saved" hidden>Saved</span>
+      </header>
+
+      <section class="card" aria-labelledby="appearance-heading">
+        <h2 id="appearance-heading">Panel appearance</h2>
+        <p class="hint">Changes apply instantly to every open YouTube tab.</p>
+
+        <div class="preview" aria-hidden="true">
+          <div class="preview-player">
+            <div class="preview-dock" id="preview-dock">
+              <div class="preview-panel" id="preview-panel">
+                <span class="preview-title">Playback speed</span>
+                <span class="preview-value" id="preview-value">2.00x</span>
+              </div>
+              <span class="preview-pill" id="preview-pill">2.00x</span>
+            </div>
+          </div>
+        </div>
+
+        <label class="row" for="ui-scale">
+          <span class="row-text">
+            Size
+            <small>Scale the pill and panel</small>
+          </span>
+          <span class="row-control">
+            <input id="ui-scale" type="range" min="0.8" max="1.4" step="0.05" value="1" />
+            <output id="ui-scale-value" for="ui-scale">100%</output>
+          </span>
+        </label>
+
+        <label class="row" for="ui-opacity">
+          <span class="row-text">
+            Transparency
+            <small>Lower values fade the controls</small>
+          </span>
+          <span class="row-control">
+            <input id="ui-opacity" type="range" min="0.4" max="1" step="0.05" value="1" />
+            <output id="ui-opacity-value" for="ui-opacity">100%</output>
+          </span>
+        </label>
+
+        <fieldset class="row row-stack">
+          <legend class="row-text">Position</legend>
+          <div class="segmented">
+            <label>
+              <input type="radio" name="ui-position" value="right" checked />
+              <span>Bottom right</span>
+            </label>
+            <label>
+              <input type="radio" name="ui-position" value="left" />
+              <span>Bottom left</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <label class="row" for="ui-autohide">
+          <span class="row-text">
+            Auto-hide
+            <small>Show controls only on hover or focus</small>
+          </span>
+          <input id="ui-autohide" class="switch" type="checkbox" />
+        </label>
+      </section>
+
+      <section class="card" aria-labelledby="hotkeys-heading">
+        <h2 id="hotkeys-heading">Keyboard</h2>
+
+        <label class="row" for="hotkeys-enabled">
+          <span class="row-text">
+            Enable shortcuts
+            <small>Shift + . / Shift + , to change speed</small>
+          </span>
+          <input id="hotkeys-enabled" class="switch" type="checkbox" checked />
+        </label>
+
+        <label class="row" for="hotkey-step">
+          <span class="row-text">
+            Step size
+            <small>How much each shortcut press changes the speed</small>
+          </span>
+          <select id="hotkey-step">
+            <option value="0.05">0.05x</option>
+            <option value="0.1">0.10x</option>
+            <option value="0.25" selected>0.25x</option>
+            <option value="0.5">0.50x</option>
+          </select>
+        </label>
+
+        <div class="keys">
+          <div><kbd>Shift</kbd> + <kbd>.</kbd> faster</div>
+          <div><kbd>Shift</kbd> + <kbd>,</kbd> slower</div>
+          <div><kbd>Shift</kbd> + <kbd>0</kbd> back to 1x</div>
+          <div><kbd>Shift</kbd> + <kbd>1</kbd>…<kbd>4</kbd> jump to 1x–4x</div>
+        </div>
+      </section>
+
+      <section class="actions">
+        <button id="reset-appearance" type="button">Reset appearance</button>
+        <button id="reset-all" type="button" class="danger">Reset everything</button>
+      </section>
+
+      <p id="status" class="status" role="status" hidden></p>
+      <p class="foot">Speed Master is not affiliated with YouTube or Google.</p>
+    </main>
+
+    <script src="options.js"></script>
+  </body>
+</html>

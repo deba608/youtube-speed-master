@@ -5,6 +5,25 @@ All notable changes to Speed Master are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] — 2026-11-06
+
+### Added
+
+- **Panel appearance** — options page with size (80–140%), transparency (40–100%), bottom-left or
+  bottom-right placement and optional auto-hide. Changes apply to open tabs without a reload.
+- **Live preview** on the options page showing the current size, transparency and position.
+- **Keyboard preferences** — enable/disable shortcuts and choose a 0.05x–0.50x step size.
+- **More shortcuts** — `Shift` + `0` resets to 1x; `Shift` + `1`…`4` jumps to 1x–4x.
+- **Accessibility** — polite live-region announcements for speed changes, focus returns to the pill
+  when the panel closes with `Esc`, and a settings button in the popup header.
+- **Shorts placement** — the panel is raised on `/shorts/` pages so it clears the action rail.
+
+### Changed
+
+- Settings page is registered through the manifest's `options_ui`; the popup gear button opens it.
+- Export/import and **Reset all** now include the appearance and hotkey settings.
+- The panel hint shows the active step size, or “Hotkeys off” when shortcuts are disabled.
+
 ## [1.1.0] — 2026-11-06
 
 ### Added
@@ -67,5 +86,6 @@ First public release.
 - UI intentionally caps at 4x; higher rates are console-only.
 - Firefox requires a `browser.*` shim and is not supported yet.
 
+[1.2.0]: https://github.com/deba608/youtube-speed-master/releases/tag/v1.2.0
 [1.1.0]: https://github.com/deba608/youtube-speed-master/releases/tag/v1.1.0
 [1.0.0]: https://github.com/deba608/youtube-speed-master/releases/tag/v1.0.0

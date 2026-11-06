@@ -1,6 +1,6 @@
 # Chrome Web Store listing — Speed Master
 
-Store copy and metadata for Speed Master v1.1.0.
+Store copy and metadata for Speed Master v1.2.0.
 
 Dashboard walkthrough: [PUBLISH.md](PUBLISH.md).
 
@@ -9,7 +9,7 @@ Dashboard walkthrough: [PUBLISH.md](PUBLISH.md).
 ## Identity
 
 - **Name:** Speed Master
-- **Version:** 1.1.0
+- **Version:** 1.2.0
 - **Category:** Productivity
 - **Language:** English
 - **Visibility:** Public, all regions
@@ -33,7 +33,8 @@ Speed Master unlocks playback speeds beyond YouTube's built-in 2x cap.
 WATCH FASTER
 • Slider from 0.25x to 4x in 0.05x steps
 • 11 one-click presets: 0.5 / 0.75 / 1 / 1.25 / 1.5 / 1.75 / 2 / 2.5 / 3 / 3.5 / 4
-• Shift + . and Shift + , step the speed by 0.25x without touching the mouse
+• Shift + . and Shift + , step the speed without touching the mouse
+• Shift + 0 resets to 1x; Shift + 1…4 jump to 1x–4x
 • The speed applies to every new video, survives in-page navigation, and re-applies if the player resets it
 
 SOUND STAYS NATURAL
@@ -59,12 +60,14 @@ BACKUP AND RESTORE
 
 KEEPS OUT OF THE WAY
 • Compact speed pill in the player; open the full panel only when you need it
+• Make it yours: panel size (80–140%), transparency, left or right placement, auto-hide
+• Configure the shortcut step (0.05x–0.50x) or turn shortcuts off
 • Ads always play at 1x
-• Works in fullscreen
+• Works in fullscreen and on Shorts
 
 PRIVACY
 • No analytics, no telemetry, no accounts, no servers
-• The only stored data is your speed and pitch preference
+• The only stored data is your playback preferences and optional channel memory
 • No remote code; everything ships inside the extension
 
 Note: playback rates above 4x are available through the console API for power users, but the
@@ -73,6 +76,8 @@ store UI stays within 0.25x–4x.
 Not affiliated with YouTube or Google. YouTube is a trademark of Google LLC.
 
 CHANGELOG
+1.2.0 — panel size, transparency, position and auto-hide; options page with live preview;
+configurable shortcut step; Shift+0 reset and Shift+1…4 jumps; accessibility improvements.
 1.1.0 — per-channel speed memory, custom presets, export/import, reset all, overlay-ad detection,
 post-ad speed restore.
 1.0.0 — first release: overlay panel, slider, presets, hotkeys, popup defaults, sync storage,
@@ -88,7 +93,7 @@ the built-in 2x limit.
 
 | Permission | Justification |
 |---|---|
-| `storage` | Save the user's preferred playback speed and pitch setting locally and sync them through their Chrome profile. |
+| `storage` | Save the user's playback preferences (speed, pitch, presets, appearance, shortcuts) and optional per-channel speeds, syncing the preferences through their Chrome profile. |
 | Content script on `*://*.youtube.com/*` | Set the `<video>` element's `playbackRate` and show the speed panel on YouTube pages. No page data is read or transmitted. |
 
 No host permissions beyond `youtube.com`. No `tabs`, `history`, `scripting` or `webRequest`.
@@ -106,7 +111,7 @@ No host permissions beyond `youtube.com`. No `tabs`, `history`, `scripting` or `
 
 | Asset | File | Status |
 |---|---|---|
-| Extension ZIP | `dist/youtube-speed-master-1.1.0.zip` | built by `npm run package` |
+| Extension ZIP | `dist/youtube-speed-master-1.2.0.zip` | built by `npm run package` |
 | Store icon 128x128 | `icons/icon128.png` | done |
 | Screenshot 1 (1280x800) | `store/screenshot-1.png` | panel open at 2.5x |
 | Screenshot 2 (1280x800) | `store/screenshot-2.png` | popup settings |

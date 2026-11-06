@@ -13,7 +13,7 @@
 <p align="center">
   <a href="https://github.com/deba608/youtube-speed-master/releases"><img src="https://img.shields.io/github/v/release/deba608/youtube-speed-master?label=release&color=2dd4bf" alt="Release" /></a>
   <a href="manifest.json"><img src="https://img.shields.io/badge/manifest-v3-2dd4bf" alt="Manifest V3" /></a>
-  <a href="tests/qa.mjs"><img src="https://img.shields.io/badge/QA-43%2F43-2dd4bf" alt="QA: 43/43" /></a>
+  <a href="tests/qa.mjs"><img src="https://img.shields.io/badge/QA-61%2F61-2dd4bf" alt="QA: 61/61" /></a>
   <a href="PRIVACY.md"><img src="https://img.shields.io/badge/tracking-none-2dd4bf" alt="No tracking" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/deba608/youtube-speed-master?color=2dd4bf" alt="License: MIT" /></a>
 </p>
@@ -35,22 +35,27 @@
 
 - **Beyond 2x** — slider from 0.25x to 4x in 0.05x steps, plus 11 one-click presets
   (0.5 / 0.75 / 1 / 1.25 / 1.5 / 1.75 / 2 / 2.5 / 3 / 3.5 / 4).
-- **Keyboard-first** — `Shift + .` speeds up by 0.25x, `Shift + ,` slows down by 0.25x.
+- **Keyboard-first** — `Shift + .` / `Shift + ,` step the speed (0.05x–0.50x, configurable),
+  `Shift + 0` resets, `Shift + 1`…`4` jump to 1x–4x.
 - **In-player panel** — a compact speed pill opens a full panel; `Esc` or a click outside closes it.
 - **Set it once** — choose a default speed in the toolbar popup; changes apply live to open tabs.
+- **Make it yours** — options page for panel size (80–140%), transparency, left/right placement and
+  auto-hide, with a live preview.
 - **Per-channel memory** — opt in to “Remember this channel” and lectures keep 2.5x while music
   stays at 1.25x. Managed from the popup.
 - **Your presets** — add or remove preset speeds (3–12, 0.25x–4x); one click restores defaults.
-- **Backup and restore** — export speed, pitch, presets and channel memory to JSON, import it back,
-  or reset everything.
+- **Backup and restore** — export speed, pitch, presets, channel memory and appearance settings to
+  JSON, import it back, or reset everything.
 - **Pitch stays natural** — pitch preservation is on by default and toggleable in the panel or popup.
+- **Accessible** — labelled controls, live-region speed announcements and focus returned to the pill
+  when the panel closes with `Esc`.
 - **Ads stay at 1x** — the panel shows an `Ad · 1x` badge, then your speed returns after the ad.
 - **Sticks to the video** — re-applies after SPA navigation, player rebuilds, `loadedmetadata` and
   YouTube resetting the rate. Works in fullscreen.
 - **Private by design** — no account, analytics, telemetry, remote code or network requests of its
   own.
 
-**Status:** v1.1.0 is packaged and available on GitHub. Chrome Web Store submission is the last
+**Status:** v1.2.0 is packaged and available on GitHub. Chrome Web Store submission is the last
 remaining step; see [store/PUBLISH.md](store/PUBLISH.md). What comes next is in [ROADMAP.md](ROADMAP.md).
 
 New here? [GUIDE.md](GUIDE.md) covers install, controls, settings and troubleshooting in detail.
@@ -59,13 +64,13 @@ New here? [GUIDE.md](GUIDE.md) covers install, controls, settings and troublesho
 
 ### Chrome Web Store
 
-Not live yet — v1.1.0 is ready and awaiting the final dashboard submission. The listing link will be
+Not live yet — v1.2.0 is ready and awaiting the final dashboard submission. The listing link will be
 added here once approved; the walkthrough is in [store/PUBLISH.md](store/PUBLISH.md).
 
 ### From the release ZIP (recommended for now)
 
 1. Download
-   [`youtube-speed-master-1.1.0.zip`](https://github.com/deba608/youtube-speed-master/releases/latest/download/youtube-speed-master-1.1.0.zip)
+   [`youtube-speed-master-1.2.0.zip`](https://github.com/deba608/youtube-speed-master/releases/latest/download/youtube-speed-master-1.2.0.zip)
    and extract it. Chrome cannot load a `.zip` directly.
 2. Open `chrome://extensions` and enable **Developer mode**.
 3. Click **Load unpacked** and select the extracted folder that **directly contains
@@ -100,10 +105,13 @@ Step-by-step instructions for Chrome, the ZIP, Edge and Brave:
 | Open / close the panel | Click the speed pill in the player |
 | Change speed | Drag the slider (0.25x–4x, 0.05x steps) |
 | Jump to a common speed | Click a preset |
-| Faster / slower by 0.25x | `Shift + .` / `Shift + ,` |
+| Faster / slower | `Shift + .` / `Shift + ,` (step configurable) |
+| Reset to 1x | `Shift + 0` |
+| Jump to 1x / 2x / 3x / 4x | `Shift + 1` … `Shift + 4` |
 | Close the panel | `Esc`, or click outside it |
 | Natural or sped-up audio | **Keep pitch** in the panel or popup |
 | Set the default for every video | Toolbar icon → slider, presets, **Reset 1x** |
+| Change panel size / transparency / position | Toolbar icon → ⚙, or `chrome://extensions` → Details → Extension options |
 | Remember a channel's speed | Open the panel on a video → **Remember this channel** |
 
 Hotkeys are ignored while you type in a comment box, search field or the address bar. Changes made
@@ -116,6 +124,8 @@ Only these values are stored:
 | `defaultRate` | `sync` | Speed applied to new videos (0.25–4 from the UI) |
 | `preservesPitch` | `sync` | Keep audio natural (`true`) or let it rise (`false`) |
 | `presets` | `sync` | Custom preset list (3–12 rates) |
+| `uiScale`, `uiOpacity`, `uiPosition`, `uiAutoHide` | `sync` | Panel appearance |
+| `hotkeysEnabled`, `hotkeyStep` | `sync` | Shortcut preference and step size |
 | `channelRates` | `local` | Per-channel speeds plus channel names |
 
 If Chrome sync is enabled, the `sync` keys follow your Chrome profile to other computers. Channel
@@ -182,7 +192,7 @@ The extension is MV3, requests only the `storage` permission, and runs a content
 | Command | What it does |
 |---|---|
 | `npm run check` | Syntax-check `src/content.js` and `src/popup.js` |
-| `npm run qa` | Run the 43-check Playwright suite |
+| `npm run qa` | Run the 61-check Playwright suite |
 | `$env:QA_REAL='1'; npm run qa` | Add the real-YouTube smoke test (3 extra checks; can be flaky) |
 | `npm run package` | Build `dist/youtube-speed-master-<version>.zip` |
 | `npm run assets` | Re-render store screenshots and the promo tile |
@@ -199,7 +209,7 @@ repository root with any static server, then open the harness paths.
 ```powershell
 npm install
 npx playwright install chromium   # once
-npm run qa                        # 43 automated checks
+npm run qa                        # 61 automated checks
 $env:QA_REAL = '1'; npm run qa    # + real youtube.com smoke test
 ```
 
@@ -215,7 +225,7 @@ Manual cases that need a human on real YouTube (live, Shorts, playlist, incognit
 ## Packaging & store assets
 
 ```powershell
-npm run package   # writes dist/youtube-speed-master-1.1.0.zip
+npm run package   # writes dist/youtube-speed-master-1.2.0.zip
 ```
 
 The ZIP contains `manifest.json`, `src/` and `icons/` only — manifest at the root, no dev files. The
@@ -238,6 +248,9 @@ src/overlay.css     overlay panel styles
 src/popup.html      toolbar settings popup
 src/popup.js        popup logic + chrome.storage.sync
 src/popup.css       popup styles
+src/options.html    appearance + keyboard settings page
+src/options.js      options logic + live preview
+src/options.css     options styles
 icons/              16 / 32 / 48 / 128 px
 scripts/            icon generator, packager, dev harnesses
 tests/              Playwright QA, fixture, store-asset renderer, manual checklist
@@ -268,7 +281,7 @@ the video URL and any console errors.
 ## Privacy
 
 Speed Master collects nothing: no analytics, no telemetry, no accounts, no servers, no remote code.
-The only stored data is your speed and pitch preference. Full policy: [PRIVACY.md](PRIVACY.md) ·
+The only stored data is your playback preferences and optional channel memory. Full policy: [PRIVACY.md](PRIVACY.md) ·
 https://deba608.github.io/youtube-speed-master/privacy.html
 
 ## Contributing
@@ -289,7 +302,7 @@ Planned releases and the reasoning behind them: [ROADMAP.md](ROADMAP.md).
 | Release | Focus |
 |---|---|
 | 1.1.0 | Per-channel speed memory, editable presets, ad hand-off hardening, export/import |
-| 1.2.0 | Options page, accessibility pass, Shorts/Music/live polish, more hotkeys |
+| 1.2.0 | Panel size/transparency/position, auto-hide, options page, keyboard preferences, accessibility |
 | 1.3.0 | Localization, Firefox and Edge listings, refreshed store assets |
 | 2.0.0 | Speed profiles and rules, custom shortcuts, temporary speed |
 

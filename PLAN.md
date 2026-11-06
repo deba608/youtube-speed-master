@@ -96,7 +96,7 @@ YouTube-Speed-Master/
 {
   "manifest_version": 3,
   "name": "YouTube Speed Master",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Unlock YouTube playback speed beyond 2x — up to 4x with one click, 16x custom.",
   "permissions": ["storage"],
   "action": { "default_popup": "src/popup.html" },
@@ -171,7 +171,7 @@ new MutationObserver(apply).observe(document.body, { childList: true, subtree: t
 
 Package for upload (zip *contents*, not the parent folder):
 ```powershell
-Compress-Archive -Path .\manifest.json, .\src, .\icons -DestinationPath .\dist\youtube-speed-master-1.1.0.zip
+Compress-Archive -Path .\manifest.json, .\src, .\icons -DestinationPath .\dist\youtube-speed-master-1.2.0.zip
 ```
 
 ---
@@ -252,5 +252,5 @@ Compress-Archive -Path .\manifest.json, .\src, .\icons -DestinationPath .\dist\y
 
 ## 9. Next Action
 
-v1.1.0 is released; Chrome Web Store submission is the only open P6 step
-([store/PUBLISH.md](store/PUBLISH.md)). Feature work starts at **1.1.0** in [ROADMAP.md](ROADMAP.md).
+v1.2.0 is released; Chrome Web Store submission is the only open P6 step
+([store/PUBLISH.md](store/PUBLISH.md)). Feature work starts at **1.3.0** in [ROADMAP.md](ROADMAP.md).

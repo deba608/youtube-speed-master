@@ -15,7 +15,25 @@
   const MAX_PRESETS = 12;
   const MAX_CHANNELS = 500;
   const CHANNEL_PATH = /^\/(?:@|channel\/|c\/|user\/)/;
-  const DEFAULTS = { defaultRate: 1, preservesPitch: true, presets: DEFAULT_PRESETS };
+  const DEFAULTS = {
+    defaultRate: 1,
+    preservesPitch: true,
+    presets: DEFAULT_PRESETS,
+    uiScale: 1,
+    uiOpacity: 1,
+    uiPosition: 'right',
+    uiAutoHide: false,
+    hotkeysEnabled: true,
+    hotkeyStep: 0.25,
+  };
+  const UI_KEYS = [
+    'uiScale',
+    'uiOpacity',
+    'uiPosition',
+    'uiAutoHide',
+    'hotkeysEnabled',
+    'hotkeyStep',
+  ];
 
   const el = (id) => document.getElementById(id);
   const slider = el('speed');
@@ -35,6 +53,7 @@
   const importSettings = el('import-settings');
   const importFile = el('import-file');
   const resetAll = el('reset-all');
+  const openOptions = el('open-options');
   const status = el('status');
 
   let state = { ...DEFAULTS, presets: [...DEFAULT_PRESETS] };
@@ -250,6 +269,10 @@
     saveSync({ defaultRate: 1 });
   });
 
+  openOptions.addEventListener('click', () => {
+    chrome.runtime.openOptionsPage();
+  });
+
   pitch.addEventListener('change', () => {
     state.preservesPitch = pitch.checked;
     saveSync({ preservesPitch: state.preservesPitch });
@@ -325,6 +348,7 @@
         defaultRate: clampRate(state.defaultRate),
         preservesPitch: state.preservesPitch,
         presets: [...state.presets],
+        ...Object.fromEntries(UI_KEYS.map((key) => [key, state[key]])),
       },
       channels,
     };
@@ -367,6 +391,9 @@
       preservesPitch: settings.preservesPitch !== false,
       presets: sanitizePresets(settings.presets),
     };
+    for (const key of UI_KEYS) {
+      if (settings[key] !== undefined) next[key] = settings[key];
+    }
     const nextChannels = sanitizeChannels(data.channels ?? {});
 
     chrome.storage.sync.set(next, () => {
@@ -389,9 +416,9 @@
   });
 
   resetAll.addEventListener('click', () => {
-    chrome.storage.sync.remove(['defaultRate', 'preservesPitch', 'presets'], () => {
+    chrome.storage.sync.remove(['defaultRate', 'preservesPitch', 'presets', ...UI_KEYS], () => {
       chrome.storage.local.set({ channelRates: {} }, () => {
-        state = { defaultRate: 1, preservesPitch: true, presets: [...DEFAULT_PRESETS] };
+        state = { ...DEFAULTS, presets: [...DEFAULT_PRESETS] };
         channels = {};
         renderAll();
         showStatus('All settings reset');
@@ -406,6 +433,9 @@
       if (changes.defaultRate) state.defaultRate = clampRate(changes.defaultRate.newValue ?? 1);
       if (changes.preservesPitch) state.preservesPitch = changes.preservesPitch.newValue !== false;
       if (changes.presets) state.presets = sanitizePresets(changes.presets.newValue);
+      for (const key of UI_KEYS) {
+        if (changes[key]) state[key] = changes[key].newValue;
+      }
       renderAll();
     } else if (area === 'local' && changes.channelRates) {
       channels = sanitizeChannels(changes.channelRates.newValue);
@@ -418,10 +448,14 @@
   chrome.storage.sync.get(DEFAULTS, (items) => {
     if (chrome.runtime.lastError) return;
     state = {
+      ...DEFAULTS,
       defaultRate: clampRate(items.defaultRate),
       preservesPitch: items.preservesPitch !== false,
       presets: sanitizePresets(items.presets),
     };
+    for (const key of UI_KEYS) {
+      if (items[key] !== undefined) state[key] = items[key];
+    }
     renderSpeed();
     renderPresetButtons();
     renderPresetEditor();

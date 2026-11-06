@@ -29,8 +29,8 @@ optional reading.
 Two ZIPs work; both must be extracted first — Chrome cannot load a `.zip`.
 
 - **Packaged build** (recommended, only runtime files):
-  [`youtube-speed-master-1.1.0.zip`](https://github.com/deba608/youtube-speed-master/releases/latest/download/youtube-speed-master-1.1.0.zip)
-  — or run `npm run package` in a clone to produce `dist/youtube-speed-master-1.1.0.zip`
+  [`youtube-speed-master-1.2.0.zip`](https://github.com/deba608/youtube-speed-master/releases/latest/download/youtube-speed-master-1.2.0.zip)
+  — or run `npm run package` in a clone to produce `dist/youtube-speed-master-1.2.0.zip`
 - **Repository source**: GitHub → **Code** → **Download ZIP**
 
 1. Extract the ZIP to a permanent folder, e.g. `C:\Users\Dev\Speed-Master`.
@@ -83,8 +83,10 @@ If the pill does not appear, see [Troubleshooting](#troubleshooting).
 | Open / close the panel | Click the speed pill |
 | Change speed | Drag the slider (0.25x–4x, 0.05x steps) |
 | Jump to a common speed | Click a preset: 0.5 / 0.75 / 1 / 1.25 / 1.5 / 1.75 / 2 / 2.5 / 3 / 3.5 / 4 |
-| Faster by 0.25x | <kbd>Shift</kbd> + <kbd>.</kbd> |
-| Slower by 0.25x | <kbd>Shift</kbd> + <kbd>,</kbd> |
+| Faster by one step | <kbd>Shift</kbd> + <kbd>.</kbd> (0.25x by default) |
+| Slower by one step | <kbd>Shift</kbd> + <kbd>,</kbd> |
+| Back to 1x | <kbd>Shift</kbd> + <kbd>0</kbd> |
+| Jump to 1x / 2x / 3x / 4x | <kbd>Shift</kbd> + <kbd>1</kbd> … <kbd>4</kbd> |
 | Close the panel | <kbd>Esc</kbd>, or click outside it |
 | Natural or chipmunk audio | **Keep pitch** checkbox in the panel |
 | Remember a channel's speed | **Remember &lt;channel&gt;** checkbox in the panel |
@@ -102,10 +104,30 @@ Click the Speed Master icon to set the **default speed for every video**:
 - **Presets** — add a speed, remove one (minimum three), or restore defaults.
 - **Remembered channels** — every channel saved from the player, with per-row remove and
   **Clear all**.
-- **Export / Import / Reset all** — JSON backup of speed, pitch, presets and channel memory.
+- **Export / Import / Reset all** — JSON backup of speed, pitch, presets, channel memory and
+  appearance settings.
+- **Settings (⚙)** — opens the appearance and keyboard page described below.
 
 Changes apply immediately to open YouTube tabs and are remembered across restarts. If you are
 signed in to Chrome, they also sync to your other computers through your Chrome profile.
+
+### Appearance and keyboard settings
+
+Click the ⚙ button in the popup header (or `chrome://extensions` → Speed Master → **Extension
+options**). Changes apply live to open tabs and are saved through Chrome sync.
+
+| Setting | Range | Notes |
+|---|---|---|
+| Size | 80% – 140% | Scales the pill and panel |
+| Transparency | 40% – 100% | Lower values fade the controls |
+| Position | Bottom right / bottom left | Moves the pill inside the player |
+| Auto-hide | On / off | Pill appears on hover or focus, stays visible while open |
+| Enable shortcuts | On / off | Turns the `Shift` shortcuts off without disabling the panel |
+| Step size | 0.05x – 0.50x | How much `Shift + .` / `Shift + ,` changes the speed |
+
+A live preview at the top of the page reflects size, transparency and position. On Shorts pages the
+panel is raised so it clears the action rail. **Reset appearance** restores the defaults; **Reset
+everything** also clears speed, presets and remembered channels.
 
 ### Per-channel memory
 
@@ -151,6 +173,8 @@ Only these values are stored:
 | `defaultRate` | `chrome.storage.sync` | Speed applied to new videos (0.25–4) |
 | `preservesPitch` | `chrome.storage.sync` | Keep audio natural (`true`) or let it rise (`false`) |
 | `presets` | `chrome.storage.sync` | Custom preset list (3–12 speeds) |
+| `uiScale`, `uiOpacity`, `uiPosition`, `uiAutoHide` | `chrome.storage.sync` | Panel appearance |
+| `hotkeysEnabled`, `hotkeyStep` | `chrome.storage.sync` | Shortcut toggle and step size |
 | `channelRates` | `chrome.storage.local` | Per-channel speeds and names |
 
 Nothing leaves your browser except Chrome's own profile sync, if you have it enabled. Channel
@@ -158,8 +182,8 @@ memory stays on this device. See [PRIVACY.md](PRIVACY.md).
 
 ### Backup, restore and reset
 
-- **Export** in the popup writes `speed-master-settings.json` with your speed, pitch, presets and
-  channel memory.
+- **Export** in the popup writes `speed-master-settings.json` with your speed, pitch, presets,
+  channel memory and appearance settings.
 - **Import** reads that file back; invalid files are rejected without changing anything.
 - **Reset all** clears every setting and channel entry.
 
@@ -173,7 +197,8 @@ To remove everything including storage, uninstall the extension.
 |---|---|
 | No speed pill on a video | Reload the tab. Confirm the site is `youtube.com`, not an embedded player on another site. |
 | Pill appears but speed snaps back | Another extension is also setting playback rate. Disable the other speed extension and reload. |
-| Hotkeys do nothing | Click once inside the page first. Hotkeys are disabled while a text field has focus. |
+| Hotkeys do nothing | Click once inside the page first. Hotkeys are disabled while a text field has focus, and can be turned off in the options page. |
+| Panel is too small, too faint or on the wrong side | Toolbar icon → ⚙, then adjust size, transparency or position. |
 | Speed is ignored on ads | Expected — ads are forced to 1x on purpose. |
 | Audio sounds sped up | Enable **Keep pitch** in the panel or the popup. |
 | A channel ignores the default speed | It has a remembered rate. Open the popup → **Remembered channels** → remove it. |
@@ -201,7 +226,7 @@ Removing the extension also deletes its saved speed and pitch settings.
 ## Privacy
 
 Speed Master collects nothing: no analytics, no telemetry, no accounts, no network requests of its
-own. The only stored data is your speed and pitch preference. Full policy:
+own. The only stored data is your playback preferences and optional channel memory. Full policy:
 [PRIVACY.md](PRIVACY.md) · <https://deba608.github.io/youtube-speed-master/privacy.html>
 
 Not affiliated with YouTube or Google. YouTube is a trademark of Google LLC.

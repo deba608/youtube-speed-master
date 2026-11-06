@@ -361,7 +361,18 @@
   display: none;
 }
 
+#ytsm-root .ytsm-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  #ytsm-root .ytsm-dock,
   #ytsm-root .ytsm-panel,
   #ytsm-root .ytsm-toggle,
   #ytsm-root .ytsm-preset {
