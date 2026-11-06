@@ -55,19 +55,15 @@
 - **Private by design** — no account, analytics, telemetry, remote code or network requests of its
   own.
 
-**Status:** v1.2.0 is packaged and available on GitHub. Chrome Web Store submission is the last
-remaining step; see [store/PUBLISH.md](store/PUBLISH.md). What comes next is in [ROADMAP.md](ROADMAP.md).
+**Status:** v1.2.0 is packaged and available on GitHub. Distribution is the release ZIP for now;
+the Chrome Web Store listing is deferred (one-time $5 developer fee). What comes next is in
+[ROADMAP.md](ROADMAP.md).
 
 New here? [GUIDE.md](GUIDE.md) covers install, controls, settings and troubleshooting in detail.
 
 ## Install
 
-### Chrome Web Store
-
-Not live yet — v1.2.0 is ready and awaiting the final dashboard submission. The listing link will be
-added here once approved; the walkthrough is in [store/PUBLISH.md](store/PUBLISH.md).
-
-### From the release ZIP (recommended for now)
+### From the release ZIP (recommended)
 
 1. Download
    [`youtube-speed-master-1.2.0.zip`](https://github.com/deba608/youtube-speed-master/releases/latest/download/youtube-speed-master-1.2.0.zip)
@@ -233,7 +229,7 @@ script verifies the required entries and fails if any are missing.
 
 - Listing copy, permission justifications and data disclosures:
   [store/LISTING.md](store/LISTING.md)
-- Dashboard walkthrough (account → upload → submit): [store/PUBLISH.md](store/PUBLISH.md)
+- Dashboard walkthrough (deferred until the store fee is available): [store/PUBLISH.md](store/PUBLISH.md)
 - Screenshots and promo tile: `store/`, regenerated with `npm run assets`
 - Privacy policy (public): https://deba608.github.io/youtube-speed-master/privacy.html
 - Source of the policy page: [docs/privacy.html](docs/privacy.html)
@@ -303,7 +299,7 @@ Planned releases and the reasoning behind them: [ROADMAP.md](ROADMAP.md).
 |---|---|
 | 1.1.0 | Per-channel speed memory, editable presets, ad hand-off hardening, export/import |
 | 1.2.0 | Panel size/transparency/position, auto-hide, options page, keyboard preferences, accessibility |
-| 1.3.0 | Localization, Firefox and Edge listings, refreshed store assets |
+| 1.3.0 | Localization, Firefox port, store asset refresh (store listings deferred) |
 | 2.0.0 | Speed profiles and rules, custom shortcuts, temporary speed |
 
 Constraints stay fixed: `storage` permission only, no remote code or analytics, ads at 1x, UI capped

@@ -14,17 +14,7 @@ optional reading.
 
 ## Install
 
-### Option A — Chrome Web Store (recommended)
-
-1. Open the Speed Master listing in the Chrome Web Store.
-2. Click **Add to Chrome** → **Add extension**.
-3. Pin the icon: click the puzzle-piece button in the toolbar, then the pin next to **Speed
-   Master**.
-4. Open any YouTube video. A speed pill appears in the bottom-right of the player.
-
-> The listing goes live with the P6 release. Until then use Option B.
-
-### Option B — From a ZIP (no store)
+### Option A — From the release ZIP (recommended)
 
 Two ZIPs work; both must be extracted first — Chrome cannot load a `.zip`.
 
@@ -51,7 +41,10 @@ with a newer build, press the reload icon on the extension card, then reload the
 If Chrome says **“Manifest file is missing or unreadable”**, you selected the parent folder — go one
 level down to the folder holding `manifest.json`.
 
-### Option C — Microsoft Edge
+The Chrome Web Store listing is deferred for now. GitHub releases are the only distribution
+channel, so there is no $5 developer fee.
+
+### Option B — Microsoft Edge
 
 Edge accepts the same ZIP and the same unpacked folder.
 

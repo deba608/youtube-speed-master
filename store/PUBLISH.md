@@ -1,5 +1,9 @@
 # Publishing Speed Master to the Chrome Web Store (P6)
 
+> **Deferred.** GitHub release ZIP is the only distribution channel for now. The Chrome Web Store
+> requires a one-time **$5 USD** developer registration fee; keep this walkthrough for when that fee
+> is available. Nothing below is required to install or update the extension.
+
 Everything that can be prepared from the repository is done. What remains needs a signed-in
 Google account, the one-time developer fee and a final **Submit for review** click.
 
@@ -107,7 +111,7 @@ Sets the HTML5 video playback rate on YouTube pages so viewers can watch faster 
 
 | Permission | Justification to paste |
 |---|---|
-| `storage` | `Saves the user's preferred playback speed and pitch setting locally and syncs them through their Chrome profile.` |
+| `storage` | `Saves the user's playback preferences (speed, pitch, presets, panel appearance, shortcuts) and optional per-channel speeds, syncing preferences through their Chrome profile.` |
 | Host/content script `*://*.youtube.com/*` | `Sets the playbackRate of the HTML5 video element and shows the speed panel on YouTube pages. No page data is read, stored or transmitted.` |
 
 If the dashboard asks for a **remote code** declaration, answer **No — all code is bundled in the

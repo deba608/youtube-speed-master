@@ -25,12 +25,13 @@ Effort is rough (S < 1 day, M 1–3 days, L 1–2 weeks).
 | 7 | 1.2.0 | Shorts / Music / live-stream polish | High | M | Medium |
 | 8 | 1.2.0 | Extended hotkeys | Medium | S | Low |
 | 9 | 1.3.0 | Localization (5 languages) | Medium | M | Low |
-| 10 | 1.3.0 | Firefox + Edge ports | High | L | Medium |
+| 10 | 1.3.0 | Firefox port (Edge already runs the same ZIP unpacked) | High | L | Medium |
 | 11 | 2.0.0 | Speed profiles / rules | Medium | L | Medium |
 | 12 | infra | CI + automated store package | High | S | Low |
 
 Recommendation: **1.2.0 shipped** with appearance controls, an options page and configurable hotkeys.
-The next release is **1.3.0** — localization and the Firefox/Edge ports.
+The next release is **1.3.0** — localization and the Firefox port. Store listings are deferred:
+GitHub release ZIPs are the only distribution channel for now.
 
 ---
 
@@ -165,7 +166,8 @@ Typing in inputs, textareas, contenteditable and the search box stays ignored.
 
 ### 1.10 Firefox + Edge
 
-- **Edge:** same MV3 ZIP, new listing at Partner Center. No code change.
+- **Edge:** already runs the same MV3 ZIP unpacked; a Partner Center listing is free but deferred
+  until store listings are back in scope.
 - **Firefox:** `browser_specific_settings.gecko.id`, promise-based storage shim, MV3 background
   differences, AMO package script, `data_collection_permissions` declaration.
 - Shared core stays one file; platform shim selected at build time.

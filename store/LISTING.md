@@ -2,6 +2,9 @@
 
 Store copy and metadata for Speed Master v1.2.0.
 
+> **Deferred.** No store submission is planned for now. GitHub release ZIP is the distribution
+> channel; this copy is kept ready for a future Chrome Web Store listing.
+
 Dashboard walkthrough: [PUBLISH.md](PUBLISH.md).
 
 ---
